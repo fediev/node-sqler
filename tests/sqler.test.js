@@ -6,7 +6,31 @@ describe('sqler', function() {
   describe('select()', function() {
     const tests = [
       // [description, limit expression, expected result]
-
+      // ORDER BY clause examples
+      [
+        'string -> ORDER BY fd1, fd2',
+        {
+          tb: 'tb1',
+          orderBy: ' fd1, fd2 ',
+        },
+        'SELECT * FROM tb1 ORDER BY fd1, fd2',
+      ],
+      [
+        'array ["fd1", "fd2"] -> ORDER BY fd1, fd2',
+        {
+          tb: 'tb1',
+          orderBy: ['fd1', 'fd2'],
+        },
+        'SELECT * FROM tb1 ORDER BY fd1, fd2',
+      ],
+      [
+        'object { fd1: "DESC", fd2: "ASC" } -> ORDER BY fd1 DESC, fd2 ASC',
+        {
+          tb: 'tb1',
+          orderBy: { fd1: 'DESC', fd2: 'ASC' },
+        },
+        'SELECT * FROM tb1 ORDER BY fd1 DESC, fd2 ASC',
+      ],
       // LIMIT clause examples
       [
         'string -> LIMIT 1, 2',
