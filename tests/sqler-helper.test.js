@@ -1,8 +1,28 @@
 /* eslint-disable prefer-arrow-callback, func-names */
 const { expect } = require('chai');
-const { sqlLimit } = require('../lib/sqler-helper');
+const { sqlOrderBy, sqlLimit } = require('../lib/sqler-helper');
 
 describe('sqlerHelper', function() {
+  describe('sqlOrderBy()', function() {
+    const tests = [
+      // [description, limit expression, expected result]
+      ['should return string as it is', ' fd1, fd2 ', 'ORDER BY fd1, fd2'],
+      ['should process array', ['fd1', 'fd2'], 'ORDER BY fd1, fd2'],
+      [
+        'should process object',
+        { fd1: 'DESC', fd2: 'ASC' },
+        'ORDER BY fd1 DESC, fd2 ASC',
+      ],
+    ];
+
+    tests.forEach(function([desc, orderBy, expected]) {
+      it(desc, function() {
+        const result = sqlOrderBy(orderBy);
+        expect(result).to.eq(expected);
+      });
+    });
+  });
+
   describe('sqlLimit()', function() {
     const tests = [
       // [description, limit expression, expected result]
