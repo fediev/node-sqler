@@ -13,6 +13,17 @@ describe('sqlerHelper', function() {
         { fd1: 'DESC', fd2: 'ASC' },
         'ORDER BY fd1 DESC, fd2 ASC',
       ],
+      [
+        'should process object value case insensitively',
+        { fd1: 'desc', fd2: 'asc' },
+        'ORDER BY fd1 DESC, fd2 ASC',
+      ],
+      ['should return empty string on whitespace string', '    ', ''],
+      [
+        'should process invalid direction value as ASC',
+        { fd1: '_INVALID_DIR_' },
+        'ORDER BY fd1 ASC',
+      ],
     ];
 
     tests.forEach(function([desc, orderBy, expected]) {
