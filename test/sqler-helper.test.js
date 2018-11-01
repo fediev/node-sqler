@@ -1,8 +1,59 @@
 /* eslint-disable prefer-arrow-callback, func-names */
 const { expect } = require('chai');
-const { sqlOrderBy, sqlLimit } = require('../lib/sqler-helper');
+const { sqlWhere, sqlOrderBy, sqlLimit } = require('../lib/sqler-helper');
+const { where } = require('../lib/sqler');
 
 describe('sqlerHelper', function() {
+  describe('sqlWhere()', function() {
+    const tests = [
+      // [description, limit expression, expected result]
+      [
+        'should return string as it is',
+        ` fd1 = 1 AND fd2 = 'a' `,
+        `WHERE fd1 = 1 AND fd2 = 'a'`,
+      ],
+      ['should process function', where('fd1', '=', 'a'), `WHERE fd1 = 'a'`],
+      [
+        'should process simple value in object',
+        { fd1: 1, fd2: 'a' },
+        `WHERE fd1 = 1 AND fd2 = 'a'`,
+      ],
+      [
+        'should process array in object',
+        { fd1: [1, 'a'] },
+        `WHERE fd1 IN (1, 'a')`,
+      ],
+      [
+        'should process function(where operator processor) in object',
+        { fd1: where('=', 'a') },
+        `WHERE fd1 = 'a'`,
+      ],
+      [
+        'should process string in array',
+        ['fd1 = 1', `fd2 = 'a'`],
+        `WHERE fd1 = 1 AND fd2 = 'a'`,
+      ],
+      [
+        'should process object in array',
+        ['fd1 = 1', { fd2: 'a', fd3: [2, 3, 4] }],
+        `WHERE fd1 = 1 AND fd2 = 'a' AND fd3 IN (2, 3, 4)`,
+      ],
+      [
+        'should process function(where operator processor) in array',
+        ['fd1 = 1', where('fd2', '=', 'a')],
+        `WHERE fd1 = 1 AND fd2 = 'a'`,
+      ],
+      ['should return empty string on whitespace string', '    ', ''],
+    ];
+
+    tests.forEach(function([desc, expr, expected]) {
+      it(desc, function() {
+        const result = sqlWhere(expr);
+        expect(result).to.eq(expected);
+      });
+    });
+  });
+
   describe('sqlOrderBy()', function() {
     const tests = [
       // [description, limit expression, expected result]
