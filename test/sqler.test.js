@@ -1,6 +1,9 @@
 /* eslint-disable prefer-arrow-callback, func-names */
 const { expect } = require('chai');
-const { select } = require('../lib/sqler');
+const {
+  select,
+  subquery
+} = require('../lib/sqler');
 
 describe('sqler', function() {
   describe('select()', function() {
@@ -88,6 +91,15 @@ describe('sqler', function() {
         const result = select(queryOption);
         expect(result).to.eq(expected);
       });
+    });
+  });
+
+  describe('subquery()', function() {
+    it('should return function of select() result', function() {
+      const queryOptions = { tb: 'tb1' };
+      const result = subquery(queryOptions)();
+      const expected = '(SELECT * FROM tb1)';
+      expect(result).to.eql(expected);
     });
   });
 });
