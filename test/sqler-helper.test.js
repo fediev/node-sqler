@@ -1,7 +1,7 @@
 /* eslint-disable prefer-arrow-callback, func-names */
 const { expect } = require('chai');
 const { sqlWhere, sqlOrderBy, sqlLimit } = require('../lib/sqler-helper');
-const { where } = require('../lib/sqler');
+const { where } = require('../lib/sqler-where-processor');
 
 describe('sqlerHelper', function() {
   describe('sqlWhere()', function() {
