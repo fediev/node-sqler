@@ -14,6 +14,7 @@ const {
   whereNotBetween,
   whereExists,
   whereNotExists,
+  or,
 } = require('../lib/sqler-where-processor');
 
 describe('SqlerWhereProcessor', function() {
@@ -134,6 +135,43 @@ describe('SqlerWhereProcessor', function() {
           });
         }
       });
+    });
+  });
+
+  describe('or()', function() {
+    const tests = [
+      ['should prepend OR to string', 'fd1 = 1', 'OR fd1 = 1'],
+      ['should prepend OR to function', where('fd1', '=', 'a'), `OR fd1 = 'a'`],
+      ['should prepend OR to object', { fd1: 1 }, 'OR fd1 = 1'],
+      [
+        'should prepend OR to two objects',
+        { fd1: 1, fd2: 'a' },
+        `OR fd1 = 1 AND fd2 = 'a'`,
+      ],
+      [
+        'should prepend OR to array',
+        ['fd1 = 1', `fd2 = 'a'`],
+        `OR fd1 = 1 AND fd2 = 'a'`,
+      ],
+    ];
+
+    tests.forEach(function([desc, expr, expected]) {
+      it(desc, function() {
+        const result = or(expr);
+        expect(result).to.eq(expected);
+      });
+    });
+
+    it('should merge multiple args with OR', function() {
+      const args = [
+        'fd1 = 1',
+        { fd2: 'a' },
+        ['fd3 = 2', 'fd4 > 3'],
+        where('fd5', '<', 4),
+      ];
+      const expected = `(fd1 = 1 OR fd2 = 'a' OR fd3 = 2 AND fd4 > 3 OR fd5 < 4)`;
+      const result = or(...args);
+      expect(result).to.eq(expected);
     });
   });
 });
