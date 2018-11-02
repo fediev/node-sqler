@@ -177,5 +177,11 @@ describe('SqlerWhereProcessor', function() {
       const result = or(...args);
       expect(result).to.eq(expected);
     });
+    it('should ignore or() inside or()', function() {
+      const args = ['fd1 = 1', or('fd2 = 2'), or({ fd3: 'a' })];
+      const expected = `(fd1 = 1 OR fd2 = 2 OR fd3 = 'a')`;
+      const result = or(...args);
+      expect(result).to.eq(expected);
+    });
   });
 });
