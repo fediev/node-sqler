@@ -19,8 +19,15 @@ const {
 
 describe('sqler', function() {
   describe('select()', function() {
-    const tests = [
-      // [description, limit expression, expected result]
+    const tester = function([desc, queryOptions, expected]) {
+      it(desc, function() {
+        const result = select(queryOptions);
+        expect(result).to.eq(expected);
+      });
+    };
+
+    const testCases = [
+      // [description, expression, expected result]
       // WHERE clause examples
       [
         'wheres: string',
@@ -188,12 +195,7 @@ describe('sqler', function() {
       ],
     ];
 
-    tests.forEach(function([desc, queryOption, expected]) {
-      it(desc, function() {
-        const result = select(queryOption);
-        expect(result).to.eq(expected);
-      });
-    });
+    testCases.forEach(tester);
   });
 
   describe('subquery()', function() {

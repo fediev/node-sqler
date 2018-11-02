@@ -19,8 +19,24 @@ const {
 
 describe('SqlerWhereProcessor', function() {
   describe('where operator processors ', function() {
-    const tests = [
-      // [description, limit expression, expected result]
+    const tester = function([desc, expr, expected]) {
+      it(desc, function() {
+        if (typeof expr === 'function') {
+          // when processor called with field argument
+          const result = expr();
+          expect(result).to.eq(expected);
+        } else if (typeof expr === 'object') {
+          // when processor called without field argument in object context
+          Object.entries(expr).forEach(([field, processor]) => {
+            const result = processor(field);
+            expect(result).to.eq(expected);
+          });
+        }
+      });
+    };
+
+    const testCases = [
+      // [description, expression, expected result]
       // where(), whereNot()
       ['where() with field', where('fd1', '=', 'a'), `fd1 = 'a'`],
       ['where() in object context', { fd1: where('=', 'a') }, `fd1 = 'a'`],
@@ -121,25 +137,18 @@ describe('SqlerWhereProcessor', function() {
       ],
     ];
 
-    tests.forEach(function([desc, expr, expected]) {
-      it(desc, function() {
-        if (typeof expr === 'function') {
-          // when processor called with field argument
-          const result = expr();
-          expect(result).to.eq(expected);
-        } else if (typeof expr === 'object') {
-          // when processor called without field argument in object context
-          Object.entries(expr).forEach(([field, processor]) => {
-            const result = processor(field);
-            expect(result).to.eq(expected);
-          });
-        }
-      });
-    });
+    testCases.forEach(tester);
   });
 
   describe('or()', function() {
-    const tests = [
+    const tester = function([desc, expr, expected]) {
+      it(desc, function() {
+        const result = or(expr);
+        expect(result).to.eq(expected);
+      });
+    };
+
+    const testCases = [
       ['should prepend OR to string', 'fd1 = 1', 'OR fd1 = 1'],
       ['should prepend OR to function', where('fd1', '=', 'a'), `OR fd1 = 'a'`],
       ['should prepend OR to object', { fd1: 1 }, 'OR fd1 = 1'],
@@ -155,12 +164,7 @@ describe('SqlerWhereProcessor', function() {
       ],
     ];
 
-    tests.forEach(function([desc, expr, expected]) {
-      it(desc, function() {
-        const result = or(expr);
-        expect(result).to.eq(expected);
-      });
-    });
+    testCases.forEach(tester);
 
     it('should merge multiple args with OR', function() {
       const args = [

@@ -5,8 +5,15 @@ const { where } = require('../lib/sqler-where-processor');
 
 describe('sqlerHelper', function() {
   describe('sqlWhere()', function() {
-    const tests = [
-      // [description, limit expression, expected result]
+    const tester = function([desc, expr, expected]) {
+      it(desc, function() {
+        const result = sqlWhere(expr);
+        expect(result).to.eq(expected);
+      });
+    };
+
+    const testCases = [
+      // [description, expression, expected result]
       [
         'should return string as it is',
         ` fd1 = 1 AND fd2 = 'a' `,
@@ -46,17 +53,19 @@ describe('sqlerHelper', function() {
       ['should return empty string on whitespace string', '    ', ''],
     ];
 
-    tests.forEach(function([desc, expr, expected]) {
-      it(desc, function() {
-        const result = sqlWhere(expr);
-        expect(result).to.eq(expected);
-      });
-    });
+    testCases.forEach(tester);
   });
 
   describe('sqlOrderBy()', function() {
-    const tests = [
-      // [description, limit expression, expected result]
+    const tester = function([desc, expr, expected]) {
+      it(desc, function() {
+        const result = sqlOrderBy(expr);
+        expect(result).to.eq(expected);
+      });
+    };
+
+    const testCases = [
+      // [description, expression, expected result]
       ['should return string as it is', ' fd1, fd2 ', 'ORDER BY fd1, fd2'],
       ['should process array', ['fd1', 'fd2'], 'ORDER BY fd1, fd2'],
       [
@@ -77,17 +86,19 @@ describe('sqlerHelper', function() {
       ],
     ];
 
-    tests.forEach(function([desc, orderBy, expected]) {
-      it(desc, function() {
-        const result = sqlOrderBy(orderBy);
-        expect(result).to.eq(expected);
-      });
-    });
+    testCases.forEach(tester);
   });
 
   describe('sqlLimit()', function() {
-    const tests = [
-      // [description, limit expression, expected result]
+    const tester = function([desc, expr, expected]) {
+      it(desc, function() {
+        const result = sqlLimit(expr);
+        expect(result).to.eq(expected);
+      });
+    };
+
+    const testCases = [
+      // [description, expression, expected result]
       ['should return string as it is', ' 1 ', 'LIMIT 1'],
       ['should return row count on number', 1, 'LIMIT 1'],
       ['should return row count on array', [1], 'LIMIT 1'],
@@ -104,11 +115,6 @@ describe('sqlerHelper', function() {
       ['should return empty string on invalid object', { offset: 2 }, ''],
     ];
 
-    tests.forEach(function([desc, limit, expected]) {
-      it(desc, function() {
-        const result = sqlLimit(limit);
-        expect(result).to.eq(expected);
-      });
-    });
+    testCases.forEach(tester);
   });
 });
