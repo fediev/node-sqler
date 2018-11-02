@@ -2,6 +2,7 @@
 const { expect } = require('chai');
 const {
   sqlTable,
+  sqlJoin,
   sqlSelectFields,
   sqlWhere,
   sqlOrderBy,
@@ -29,6 +30,77 @@ describe('sqlerHelper', function() {
     it('should throw when no table name supplied', function() {
       expect(() => sqlTable()).to.throw('NO_TABLE_SUPPLIED');
     });
+  });
+
+  describe('sqlJoin()', function() {
+    const tester = function([desc, tb, join, expected]) {
+      it(desc, function() {
+        const result = sqlJoin(tb, join);
+        expect(result).to.eq(expected);
+      });
+    };
+
+    const testCases = [
+      // [description, expression, expected result]
+      [
+        'should join without table aliases',
+        'tb1',
+        {
+          type: 'inner',
+          tb: 'tb2',
+          on: ['fd11', 'fd21'],
+        },
+        'INNER JOIN tb2 ON tb1.fd11 = tb2.fd21',
+      ],
+      [
+        'should join with the first table alias',
+        { tb1: 'a' },
+        {
+          type: 'left',
+          tb: 'tb2',
+          on: ['fd11', 'fd21'],
+        },
+        'LEFT JOIN tb2 ON a.fd11 = tb2.fd21',
+      ],
+      [
+        'should join with the second table alias',
+        'tb1',
+        {
+          type: 'left',
+          tb: { tb2: 'b' },
+          on: ['fd11', 'fd21'],
+        },
+        'LEFT JOIN tb2 AS b ON tb1.fd11 = b.fd21',
+      ],
+      [
+        'should join with table aliases',
+        { tb1: 'a' },
+        {
+          type: 'left',
+          tb: { tb2: 'b' },
+          on: ['fd11', 'fd21'],
+        },
+        'LEFT JOIN tb2 AS b ON a.fd11 = b.fd21',
+      ],
+      [
+        'should join multiple joins',
+        { tb1: 'a' },
+        [
+          {
+            type: 'left',
+            tb: { tb2: 'b' },
+            on: ['fd11', 'fd21'],
+          },
+          {
+            type: 'right',
+            tb: { tb3: 'c' },
+            on: ['fd21', 'fd31'],
+          },
+        ],
+        'LEFT JOIN tb2 AS b ON a.fd11 = b.fd21 INNER JOIN tb3 AS c ON b.fd21 = c.fd31',
+      ],
+    ];
+    testCases.forEach(tester);
   });
 
   describe('sqlSelectFields()', function() {
