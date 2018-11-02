@@ -1,9 +1,51 @@
 /* eslint-disable prefer-arrow-callback, func-names */
 const { expect } = require('chai');
-const { sqlWhere, sqlOrderBy, sqlLimit } = require('../lib/sqler-helper');
+const {
+  sqlSelectFields,
+  sqlWhere,
+  sqlOrderBy,
+  sqlLimit,
+} = require('../lib/sqler-helper');
 const { where } = require('../lib/sqler-where-processor');
 
 describe('sqlerHelper', function() {
+  describe('sqlSelectFields()', function() {
+    const tester = function([desc, expr, expected]) {
+      it(desc, function() {
+        const result = sqlSelectFields(expr);
+        expect(result).to.eq(expected);
+      });
+    };
+
+    const testCases = [
+      // [description, expression, expected result]
+      [`should return '*' on whitespace string`, `   `, `*`],
+      [`should return '*' when fields is not supplied`, undefined, `*`],
+      [
+        `should return trimmed string on string`,
+        ` fd1, fd2 AS x `,
+        `fd1, fd2 AS x`,
+      ],
+      [
+        `should parse alias on object`,
+        { fd1: 'a', fd2: 'b' },
+        `fd1 AS a, fd2 AS b`,
+      ],
+      [
+        `should return merged on array`,
+        [' fd1 ', 'fd2 AS x', 'COUNT(fd3)'],
+        `fd1, fd2 AS x, COUNT(fd3)`,
+      ],
+      [
+        `should return merged on array of string and object`,
+        [' fd1 ', { fd2: 'b', fd3: 'c' }],
+        `fd1, fd2 AS b, fd3 AS c`,
+      ],
+    ];
+
+    testCases.forEach(tester);
+  });
+
   describe('sqlWhere()', function() {
     const tester = function([desc, expr, expected]) {
       it(desc, function() {
