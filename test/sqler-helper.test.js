@@ -1,6 +1,7 @@
 /* eslint-disable prefer-arrow-callback, func-names */
 const { expect } = require('chai');
 const {
+  sqlTable,
   sqlSelectFields,
   sqlWhere,
   sqlOrderBy,
@@ -9,6 +10,27 @@ const {
 const { where } = require('../lib/sqler-where-processor');
 
 describe('sqlerHelper', function() {
+  describe('sqlTable()', function() {
+    const tester = function([desc, expr, expected]) {
+      it(desc, function() {
+        const result = sqlTable(expr);
+        expect(result).to.eq(expected);
+      });
+    };
+
+    const testCases = [
+      // [description, expression, expected result]
+      ['should get table name on string', ' tb1 ', 'tb1'],
+      ['should get table name with alias on object', { tb1: 'a' }, `tb1 AS a`],
+    ];
+
+    testCases.forEach(tester);
+
+    it('should throw when no table name supplied', function() {
+      expect(() => sqlTable()).to.throw('NO_TABLE_SUPPLIED');
+    });
+  });
+
   describe('sqlSelectFields()', function() {
     const tester = function([desc, expr, expected]) {
       it(desc, function() {
