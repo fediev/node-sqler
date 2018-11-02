@@ -28,6 +28,22 @@ describe('sqler', function() {
 
     const testCases = [
       // [description, expression, expected result]
+      // select table expression examples
+      [
+        'table: string',
+        {
+          tb: 'tb1',
+        },
+        `SELECT * FROM tb1`,
+      ],
+      [
+        'table: object for alias',
+        {
+          tb: { tb1: 'a' },
+        },
+        `SELECT * FROM tb1 AS a`,
+      ],
+
       // select fields examples
       [
         'fields: (not supplied)',
@@ -76,6 +92,7 @@ describe('sqler', function() {
         },
         `SELECT fd1, fd2 AS b, fd3 AS c FROM tb1`,
       ],
+
       // WHERE clause examples
       [
         'wheres: string',
@@ -191,6 +208,7 @@ describe('sqler', function() {
         },
         'SELECT * FROM tb1 ORDER BY fd1 DESC, fd2 ASC',
       ],
+
       // LIMIT clause examples
       [
         'string -> LIMIT 1, 2',
@@ -244,6 +262,11 @@ describe('sqler', function() {
     ];
 
     testCases.forEach(tester);
+
+    it('should throw when table is not supplied', function() {
+      expect(() => select()).to.throw('NO_TABLE_SUPPLIED');
+      expect(() => select({ fields: 'fd1' })).to.throw('NO_TABLE_SUPPLIED');
+    });
   });
 
   describe('subquery()', function() {
