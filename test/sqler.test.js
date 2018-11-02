@@ -44,6 +44,51 @@ describe('sqler', function() {
         `SELECT * FROM tb1 AS a`,
       ],
 
+      // JOIN clause examples
+      [
+        'join: no table aliases',
+        {
+          tb: 'tb1',
+          joins: {
+            type: 'inner',
+            tb: 'tb2',
+            on: ['fd11', 'fd21'],
+          },
+        },
+        `SELECT * FROM tb1 INNER JOIN tb2 ON tb1.fd11 = tb2.fd21`,
+      ],
+      [
+        'join: table aliases',
+        {
+          tb: { tb1: 'a' },
+          joins: {
+            type: 'left',
+            tb: { tb2: 'b' },
+            on: ['fd11', 'fd21'],
+          },
+        },
+        `SELECT * FROM tb1 AS a LEFT JOIN tb2 AS b ON a.fd11 = b.fd21`,
+      ],
+      [
+        'join: multiple joins',
+        {
+          tb: { tb1: 'a' },
+          joins: [
+            {
+              type: 'left',
+              tb: { tb2: 'b' },
+              on: ['fd11', 'fd21'],
+            },
+            {
+              type: 'right',
+              tb: { tb3: 'c' },
+              on: ['fd21', 'fd31'],
+            },
+          ],
+        },
+        `SELECT * FROM tb1 AS a LEFT JOIN tb2 AS b ON a.fd11 = b.fd21 INNER JOIN tb3 AS c ON b.fd21 = c.fd31`,
+      ],
+
       // select fields examples
       [
         'fields: (not supplied)',
