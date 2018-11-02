@@ -28,6 +28,54 @@ describe('sqler', function() {
 
     const testCases = [
       // [description, expression, expected result]
+      // select fields examples
+      [
+        'fields: (not supplied)',
+        {
+          tb: 'tb1',
+        },
+        `SELECT * FROM tb1`,
+      ],
+      [
+        'fields: whitespaces',
+        {
+          tb: 'tb1',
+          fields: `   `,
+        },
+        `SELECT * FROM tb1`,
+      ],
+      [
+        'fields: string',
+        {
+          tb: 'tb1',
+          fields: `  fd1, fd2 AS x  `,
+        },
+        `SELECT fd1, fd2 AS x FROM tb1`,
+      ],
+      [
+        'fields: object',
+        {
+          tb: 'tb1',
+          fields: { fd1: 'a', fd2: 'b' },
+        },
+        `SELECT fd1 AS a, fd2 AS b FROM tb1`,
+      ],
+      [
+        'fields: array of string',
+        {
+          tb: 'tb1',
+          fields: [' fd1 ', 'fd2 AS x', 'COUNT(fd3)'],
+        },
+        `SELECT fd1, fd2 AS x, COUNT(fd3) FROM tb1`,
+      ],
+      [
+        'fields: array of string and object',
+        {
+          tb: 'tb1',
+          fields: [' fd1 ', { fd2: 'b', fd3: 'c' }],
+        },
+        `SELECT fd1, fd2 AS b, fd3 AS c FROM tb1`,
+      ],
       // WHERE clause examples
       [
         'wheres: string',
