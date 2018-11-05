@@ -89,6 +89,24 @@ describe('sqler', function() {
         `SELECT * FROM tb1 AS a LEFT JOIN tb2 AS b ON a.fd11 = b.fd21 INNER JOIN tb3 AS c ON b.fd21 = c.fd31`,
       ],
 
+      // SELECT `TOP` examples
+      [
+        'top: number',
+        {
+          tb: 'tb1',
+          top: 1,
+        },
+        'SELECT TOP 1 * FROM tb1',
+      ],
+      [
+        'top: string of positive number',
+        {
+          tb: 'tb1',
+          top: '1',
+        },
+        'SELECT TOP 1 * FROM tb1',
+      ],
+
       // select fields examples
       [
         'fields: (not supplied)',
