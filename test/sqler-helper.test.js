@@ -6,10 +6,11 @@ const {
   sqlTop,
   sqlSelectFields,
   sqlWhere,
+  sqlHaving,
   sqlOrderBy,
   sqlLimit,
 } = require('../lib/sqler-helper');
-const { where } = require('../lib/sqler-where-processor');
+const { where, having } = require('../lib/sqler-where-processor');
 
 describe('sqlerHelper', function() {
   describe('sqlTable()', function() {
@@ -206,6 +207,62 @@ describe('sqlerHelper', function() {
         'should process function(where operator processor) in array',
         ['fd1 = 1', where('fd2', '=', 'a')],
         `WHERE fd1 = 1 AND fd2 = 'a'`,
+      ],
+      ['should return empty string on whitespace string', '    ', ''],
+    ];
+
+    testCases.forEach(tester);
+  });
+
+  describe('sqlHaving()', function() {
+    const tester = function([desc, expr, expected]) {
+      it(desc, function() {
+        const result = sqlHaving(expr, 'just for passing groupBy');
+        expect(result).to.eq(expected);
+      });
+    };
+
+    const testCases = [
+      // [description, expression, expected result]
+      [
+        'should return string as it is',
+        ` SUM(fd1) > 10 `,
+        `HAVING SUM(fd1) > 10`,
+      ],
+      [
+        'should process function',
+        having('SUM(fd1)', '>', 10),
+        `HAVING SUM(fd1) > 10`,
+      ],
+      [
+        'should process simple value in object',
+        { fd1: 1, fd2: 'a' },
+        `HAVING fd1 = 1 AND fd2 = 'a'`,
+      ],
+      [
+        'should process array in object',
+        { fd1: [1, 'a'] },
+        `HAVING fd1 IN (1, 'a')`,
+      ],
+      [
+        'should process function(where operator processor) in object',
+        { fd1: where('=', 'a') },
+        `HAVING fd1 = 'a'`,
+      ],
+      [
+        'should process string in array',
+        ['SUM(fd1) > 10', `fd2 = 'a'`],
+        `HAVING SUM(fd1) > 10 AND fd2 = 'a'`,
+      ],
+      [
+        'should process object in array',
+        ['SUM(fd1) > 10', { fd2: 'a', fd3: [2, 3, 4] }],
+        `HAVING SUM(fd1) > 10 AND fd2 = 'a' AND fd3 IN (2, 3, 4)`,
+      ],
+      [
+        'should process function(where operator processor) in array',
+        ['SUM(fd1) > 10', where('fd2', '=', 'a')],
+        `HAVING SUM(fd1) > 10 AND fd2 = 'a'`,
       ],
       ['should return empty string on whitespace string', '    ', ''],
     ];
