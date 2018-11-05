@@ -3,6 +3,7 @@ const { expect } = require('chai');
 const {
   sqlTable,
   sqlJoin,
+  sqlTop,
   sqlSelectFields,
   sqlWhere,
   sqlOrderBy,
@@ -100,6 +101,26 @@ describe('sqlerHelper', function() {
         'LEFT JOIN tb2 AS b ON a.fd11 = b.fd21 INNER JOIN tb3 AS c ON b.fd21 = c.fd31',
       ],
     ];
+    testCases.forEach(tester);
+  });
+
+  describe('sqlTop()', function() {
+    const tester = function([desc, expr, expected]) {
+      it(desc, function() {
+        const result = sqlTop(expr);
+        expect(result).to.eq(expected);
+      });
+    };
+
+    const testCases = [
+      ['should return TOP cluase on number', 1, 'TOP 1'],
+      ['should return a floored integer on non-integer number', 1.9, 'TOP 1'],
+      ['should return TOP cluase on string of number', '1', 'TOP 1'],
+      ['should return empty string on non-positive number', 0, ''],
+      ['should return empty string on non-numeric string', 'a', ''],
+      ['should return empty string on array of numbers', [1, 2, 3], ''],
+    ];
+
     testCases.forEach(tester);
   });
 
