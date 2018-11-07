@@ -6,6 +6,7 @@ const {
   sqlTop,
   sqlSelectFields,
   sqlWhere,
+  sqlGroupBy,
   sqlHaving,
   sqlOrderBy,
   sqlLimit,
@@ -208,6 +209,24 @@ describe('sqlerHelper', function() {
         ['fd1 = 1', where('fd2', '=', 'a')],
         `WHERE fd1 = 1 AND fd2 = 'a'`,
       ],
+      ['should return empty string on whitespace string', '    ', ''],
+    ];
+
+    testCases.forEach(tester);
+  });
+
+  describe('sqlGroupBy()', function() {
+    const tester = function([desc, expr, expected]) {
+      it(desc, function() {
+        const result = sqlGroupBy(expr);
+        expect(result).to.eq(expected);
+      });
+    };
+
+    const testCases = [
+      // [description, expression, expected result]
+      ['should return string as it is', ' fd1, fd2 ', 'GROUP BY fd1, fd2'],
+      ['should process array', ['fd1', 'fd2'], 'GROUP BY fd1, fd2'],
       ['should return empty string on whitespace string', '    ', ''],
     ];
 
