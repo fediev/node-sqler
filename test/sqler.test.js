@@ -15,6 +15,7 @@ const {
   whereExists,
   whereNotExists,
   or,
+  having,
 } = require('../lib/sqler-where-processor');
 
 describe('sqler', function() {
@@ -246,6 +247,78 @@ describe('sqler', function() {
         `SELECT * FROM tb1 WHERE EXISTS (SELECT * FROM tb2) AND NOT EXISTS (SELECT * FROM tb3)`,
       ],
 
+      // GROUP BY clause examples
+      [
+        'string -> GROUP BY fd1, fd2',
+        {
+          tb: 'tb1',
+          groupBy: ' fd1, fd2 ',
+        },
+        'SELECT * FROM tb1 GROUP BY fd1, fd2',
+      ],
+      [
+        'array ["fd1", "fd2"] -> GROUP BY fd1, fd2',
+        {
+          tb: 'tb1',
+          groupBy: ['fd1', 'fd2'],
+        },
+        'SELECT * FROM tb1 GROUP BY fd1, fd2',
+      ],
+
+      // HAVING clause examples : same as where
+      [
+        'havings: string',
+        {
+          tb: 'tb1',
+          groupBy: ['fd1', 'fd2'],
+          havings: ` COUNT(fd1) > 5 `,
+        },
+        `SELECT * FROM tb1 GROUP BY fd1, fd2 HAVING COUNT(fd1) > 5`,
+      ],
+      [
+        'havings: function(having operator processor)',
+        {
+          tb: 'tb1',
+          groupBy: ['fd1', 'fd2'],
+          havings: having('fd1', '=', 'a'),
+        },
+        `SELECT * FROM tb1 GROUP BY fd1, fd2 HAVING fd1 = 'a'`,
+      ],
+      [
+        'havings: object with simple value, array and function',
+        {
+          tb: 'tb1',
+          groupBy: ['fd1', 'fd2'],
+          havings: {
+            fd1: 1,
+            fd2: 'a',
+            fd3: [2, 3, 4],
+            fd4: where('>', 5),
+          },
+        },
+        `SELECT * FROM tb1 GROUP BY fd1, fd2 HAVING fd1 = 1 AND fd2 = 'a' AND fd3 IN (2, 3, 4) AND fd4 > 5`,
+      ],
+      [
+        'havings: array with simple value, object and function',
+        {
+          tb: 'tb1',
+          groupBy: ['fd1', 'fd2'],
+          havings: [
+            'fd1 = 1',
+            { fd2: 'a', fd3: [2, 3, 4] },
+            where('fd4', '>', 5),
+          ],
+        },
+        `SELECT * FROM tb1 GROUP BY fd1, fd2 HAVING fd1 = 1 AND fd2 = 'a' AND fd3 IN (2, 3, 4) AND fd4 > 5`,
+      ],
+      [
+        'havings: without groupBy',
+        {
+          tb: 'tb1',
+          havings: ` COUNT(fd1) `,
+        },
+        `SELECT * FROM tb1`,
+      ],
       // ORDER BY clause examples
       [
         'string -> ORDER BY fd1, fd2',
