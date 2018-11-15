@@ -159,6 +159,8 @@ describe('sqlerHelper', function() {
         [' fd1 ', { fd2: 'b', fd3: 'c' }],
         `fd1, fd2 AS b, fd3 AS c`,
       ],
+      [`should return '*' on empty array`, [], `*`],
+      [`should return '*' on empty object`, {}, `*`],
     ];
 
     testCases.forEach(tester);
