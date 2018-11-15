@@ -102,6 +102,7 @@ describe('sqlerHelper', function() {
         ],
         'LEFT JOIN tb2 AS b ON a.fd11 = b.fd21 RIGHT JOIN tb3 AS c ON b.fd21 = c.fd31',
       ],
+      ['should return empty string on empty join array', { tb1: 'a' }, [], ''],
     ];
     testCases.forEach(tester);
   });
