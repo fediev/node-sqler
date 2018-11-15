@@ -87,7 +87,7 @@ describe('sqler', function() {
             },
           ],
         },
-        `SELECT * FROM tb1 AS a LEFT JOIN tb2 AS b ON a.fd11 = b.fd21 INNER JOIN tb3 AS c ON b.fd21 = c.fd31`,
+        `SELECT * FROM tb1 AS a LEFT JOIN tb2 AS b ON a.fd11 = b.fd21 RIGHT JOIN tb3 AS c ON b.fd21 = c.fd31`,
       ],
 
       // SELECT `TOP` examples

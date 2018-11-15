@@ -100,7 +100,7 @@ describe('sqlerHelper', function() {
             on: ['fd21', 'fd31'],
           },
         ],
-        'LEFT JOIN tb2 AS b ON a.fd11 = b.fd21 INNER JOIN tb3 AS c ON b.fd21 = c.fd31',
+        'LEFT JOIN tb2 AS b ON a.fd11 = b.fd21 RIGHT JOIN tb3 AS c ON b.fd21 = c.fd31',
       ],
     ];
     testCases.forEach(tester);
