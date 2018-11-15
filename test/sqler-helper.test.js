@@ -231,6 +231,7 @@ describe('sqlerHelper', function() {
       ['should return string as it is', ' fd1, fd2 ', 'GROUP BY fd1, fd2'],
       ['should process array', ['fd1', 'fd2'], 'GROUP BY fd1, fd2'],
       ['should return empty string on whitespace string', '    ', ''],
+      ['should return empty string on empty array', [], ''],
     ];
 
     testCases.forEach(tester);
