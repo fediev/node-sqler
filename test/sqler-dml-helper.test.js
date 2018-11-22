@@ -10,7 +10,7 @@ const {
   sqlHaving,
   sqlOrderBy,
   sqlLimit,
-} = require('../lib/sqler-helper');
+} = require('../lib/sqler-dml-helper');
 const { where, having } = require('../lib/sqler-where-processor');
 
 describe('sqlerHelper', function() {
