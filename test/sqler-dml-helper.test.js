@@ -6,6 +6,7 @@ const {
   sqlTop,
   sqlSelectFields,
   sqlWhere,
+  sqlGroupByHaving,
   sqlGroupBy,
   sqlHaving,
   sqlOrderBy,
@@ -198,6 +199,33 @@ describe('sqlerHelper', function() {
       ],
       ['should return empty string on whitespace string', '    ', ''],
       ['should return empty string on null', null, ''],
+    ];
+
+    testCases.forEach(tester);
+  });
+
+  describe('sqlGroupByHaving()', function() {
+    const tester = function([desc, groupBy, havings, expected]) {
+      it(desc, function() {
+        const result = sqlGroupByHaving(groupBy, havings);
+        expect(result).to.eq(expected);
+      });
+    };
+
+    const testCases = [
+      // [description, expression, expected result]
+      [
+        'should return group by and having',
+        ['fd1', 'fd2'],
+        having('SUM(fd1)', '>', 10),
+        'GROUP BY fd1, fd2 HAVING SUM(fd1) > 10',
+      ],
+      [
+        'should return group by only on no havings',
+        ' fd1, fd2 ',
+        null,
+        'GROUP BY fd1, fd2',
+      ],
     ];
 
     testCases.forEach(tester);
