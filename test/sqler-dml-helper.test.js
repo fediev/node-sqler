@@ -36,6 +36,9 @@ describe('sqlerHelper', function() {
     it('should throw on empty object', function() {
       expect(() => sqlTable({})).to.throw('NO_OBJECT_ENTRY');
     });
+    it('should throw on null', function() {
+      expect(() => sqlTable({})).to.throw('NO_OBJECT_ENTRY');
+    });
   });
 
   describe('sqlJoin()', function() {
@@ -51,61 +54,38 @@ describe('sqlerHelper', function() {
       [
         'should join without table aliases',
         'tb1',
-        {
-          type: 'inner',
-          tb: 'tb2',
-          on: ['fd11', 'fd21'],
-        },
+        { type: 'inner', tb: 'tb2', on: ['fd11', 'fd21'] },
         'INNER JOIN tb2 ON tb1.fd11 = tb2.fd21',
       ],
       [
         'should join with the first table alias',
         { tb1: 'a' },
-        {
-          type: 'left',
-          tb: 'tb2',
-          on: ['fd11', 'fd21'],
-        },
+        { type: 'left', tb: 'tb2', on: ['fd11', 'fd21'] },
         'LEFT JOIN tb2 ON a.fd11 = tb2.fd21',
       ],
       [
         'should join with the second table alias',
         'tb1',
-        {
-          type: 'left',
-          tb: { tb2: 'b' },
-          on: ['fd11', 'fd21'],
-        },
+        { type: 'left', tb: { tb2: 'b' }, on: ['fd11', 'fd21'] },
         'LEFT JOIN tb2 AS b ON tb1.fd11 = b.fd21',
       ],
       [
         'should join with table aliases',
         { tb1: 'a' },
-        {
-          type: 'left',
-          tb: { tb2: 'b' },
-          on: ['fd11', 'fd21'],
-        },
+        { type: 'left', tb: { tb2: 'b' }, on: ['fd11', 'fd21'] },
         'LEFT JOIN tb2 AS b ON a.fd11 = b.fd21',
       ],
       [
         'should join multiple joins',
         { tb1: 'a' },
         [
-          {
-            type: 'left',
-            tb: { tb2: 'b' },
-            on: ['fd11', 'fd21'],
-          },
-          {
-            type: 'right',
-            tb: { tb3: 'c' },
-            on: ['fd21', 'fd31'],
-          },
+          { type: 'left', tb: { tb2: 'b' }, on: ['fd11', 'fd21'] },
+          { type: 'right', tb: { tb3: 'c' }, on: ['fd21', 'fd31'] },
         ],
         'LEFT JOIN tb2 AS b ON a.fd11 = b.fd21 RIGHT JOIN tb3 AS c ON b.fd21 = c.fd31',
       ],
       ['should return empty string on empty join array', { tb1: 'a' }, [], ''],
+      ['should return empty string on null', { tb1: 'a' }, null, ''],
     ];
     testCases.forEach(tester);
   });
@@ -164,6 +144,7 @@ describe('sqlerHelper', function() {
       ],
       [`should return '*' on empty array`, [], `*`],
       [`should return '*' on empty object`, {}, `*`],
+      [`should return '*' on null`, null, `*`],
     ];
 
     testCases.forEach(tester);
@@ -216,6 +197,7 @@ describe('sqlerHelper', function() {
         `WHERE fd1 = 1 AND fd2 = 'a'`,
       ],
       ['should return empty string on whitespace string', '    ', ''],
+      ['should return empty string on null', null, ''],
     ];
 
     testCases.forEach(tester);
@@ -291,6 +273,7 @@ describe('sqlerHelper', function() {
         `HAVING SUM(fd1) > 10 AND fd2 = 'a'`,
       ],
       ['should return empty string on whitespace string', '    ', ''],
+      ['should return empty string on null', null, ''],
     ];
 
     testCases.forEach(tester);
@@ -319,6 +302,7 @@ describe('sqlerHelper', function() {
         'ORDER BY fd1 DESC, fd2 ASC',
       ],
       ['should return empty string on whitespace string', '    ', ''],
+      ['should return empty string on null', null, ''],
       [
         'should process invalid direction value as ASC',
         { fd1: '_INVALID_DIR_' },
@@ -353,6 +337,7 @@ describe('sqlerHelper', function() {
       ['should return empty string on negative number', -1, ''],
       ['should return empty string on empty array', [], ''],
       ['should return empty string on invalid object', { offset: 2 }, ''],
+      ['should return empty string on null', null, ''],
     ];
 
     testCases.forEach(tester);
