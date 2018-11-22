@@ -1,6 +1,6 @@
 /* eslint-disable prefer-arrow-callback, func-names */
 const { expect } = require('chai');
-const { select, subquery } = require('../lib/sqler');
+const { select, subquery } = require('../lib/sqler-dml-builder');
 const {
   where,
   whereNot,
