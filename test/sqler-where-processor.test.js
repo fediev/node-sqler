@@ -1,5 +1,6 @@
 /* eslint-disable prefer-arrow-callback, func-names */
 const { expect } = require('chai');
+const { firstObjectEntry } = require('../lib/util');
 const { subquery } = require('../lib/sqler-dml-builder');
 const {
   where,
@@ -27,10 +28,9 @@ describe('SqlerWhereProcessor', function() {
           expect(result).to.eq(expected);
         } else if (typeof expr === 'object') {
           // when processor called without field argument in object context
-          Object.entries(expr).forEach(([field, processor]) => {
-            const result = processor(field);
-            expect(result).to.eq(expected);
-          });
+          const { key: field, value: processor } = firstObjectEntry(expr);
+          const result = processor(field);
+          expect(result).to.eq(expected);
         }
       });
     };

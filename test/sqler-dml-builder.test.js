@@ -117,14 +117,6 @@ describe('sqler', function() {
         `SELECT * FROM tb1`,
       ],
       [
-        'fields: whitespaces',
-        {
-          tb: 'tb1',
-          fields: `   `,
-        },
-        `SELECT * FROM tb1`,
-      ],
-      [
         'fields: string',
         {
           tb: 'tb1',
@@ -319,6 +311,7 @@ describe('sqler', function() {
         },
         `SELECT * FROM tb1`,
       ],
+
       // ORDER BY clause examples
       [
         'string -> ORDER BY fd1, fd2',
@@ -329,7 +322,7 @@ describe('sqler', function() {
         'SELECT * FROM tb1 ORDER BY fd1, fd2',
       ],
       [
-        'array ["fd1", "fd2"] -> ORDER BY fd1, fd2',
+        `array ['fd1', 'fd2'] -> ORDER BY fd1, fd2`,
         {
           tb: 'tb1',
           orderBy: ['fd1', 'fd2'],
@@ -337,7 +330,7 @@ describe('sqler', function() {
         'SELECT * FROM tb1 ORDER BY fd1, fd2',
       ],
       [
-        'object { fd1: "DESC", fd2: "ASC" } -> ORDER BY fd1 DESC, fd2 ASC',
+        `object { fd1: 'DESC', fd2: 'ASC' } -> ORDER BY fd1 DESC, fd2 ASC`,
         {
           tb: 'tb1',
           orderBy: { fd1: 'DESC', fd2: 'ASC' },
