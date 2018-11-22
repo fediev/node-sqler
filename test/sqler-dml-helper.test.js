@@ -243,7 +243,7 @@ describe('sqlerHelper', function() {
   describe('sqlHaving()', function() {
     const tester = function([desc, expr, expected]) {
       it(desc, function() {
-        const result = sqlHaving(expr, 'just for passing groupBy');
+        const result = sqlHaving(expr);
         expect(result).to.eq(expected);
       });
     };
