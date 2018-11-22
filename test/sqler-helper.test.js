@@ -33,6 +33,9 @@ describe('sqlerHelper', function() {
     it('should throw when no table name supplied', function() {
       expect(() => sqlTable()).to.throw('NO_TABLE_SUPPLIED');
     });
+    it('should throw on empty object', function() {
+      expect(() => sqlTable({})).to.throw('NO_OBJECT_ENTRY');
+    });
   });
 
   describe('sqlJoin()', function() {
