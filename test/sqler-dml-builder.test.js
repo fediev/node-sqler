@@ -20,9 +20,9 @@ const {
 
 describe('sqler', function() {
   describe('select()', function() {
-    const tester = function([desc, queryOptions, expected]) {
+    const tester = function([desc, queryOpts, expected]) {
       it(desc, function() {
-        const result = select(queryOptions);
+        const result = select(queryOpts);
         expect(result).to.eq(expected);
       });
     };
@@ -400,8 +400,8 @@ describe('sqler', function() {
 
   describe('subquery()', function() {
     it('should return function of select() result', function() {
-      const queryOptions = { tb: 'tb1' };
-      const result = subquery(queryOptions)();
+      const queryOpts = { tb: 'tb1' };
+      const result = subquery(queryOpts)();
       const expected = '(SELECT * FROM tb1)';
       expect(result).to.eql(expected);
     });
