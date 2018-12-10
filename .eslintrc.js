@@ -1,18 +1,20 @@
 /**
- * .eslintrc.js with airbnb
- * r.1
+ * .eslintrc.js with eslint-config-airbnb-base (for non-react projects)
+ * r.2
+ * eslint v5.9.0, eslint-config-airbnb-base v13.1.0
  */
 const OFF = 0;
 const WARN = 1;
 const ERROR = 2;
 
-module.exports = {
+const config = {
   root: true,
   env: {
     node: true,
     es6: true,
     mocha: true,
   },
+  parser: 'espree',
   parserOptions: {
     ecmaVersion: 2018,
     sourceType: 'module',
@@ -31,3 +33,5 @@ module.exports = {
     radix: [ERROR, 'as-needed'],
   },
 };
+
+module.exports = config;
