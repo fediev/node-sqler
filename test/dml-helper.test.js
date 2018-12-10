@@ -86,6 +86,13 @@ describe('sqlerHelper', function() {
         'LEFT JOIN tb2 AS b ON a.fd11 = b.fd21 RIGHT JOIN tb3 AS c ON b.fd21 = c.fd31',
       ],
       ['should return empty string on empty join array', { tb1: 'a' }, [], ''],
+      [
+        'should return empty string on array of invalid values',
+        { tb1: 'a' },
+        [{}, 1, 'join'],
+        '',
+      ],
+      ['should return empty string on emtpy object', { tb1: 'a' }, {}, ''],
       ['should return empty string on null', { tb1: 'a' }, null, ''],
     ];
     testCases.forEach(tester);
