@@ -150,6 +150,11 @@ describe('sqlerHelper', function() {
         [' fd1 ', { fd2: 'b', fd3: 'c' }],
         `fd1, fd2 AS b, fd3 AS c`,
       ],
+      [
+        `should append table alias to field`,
+        { a: ['fd11', 'fd12'], b: ['fd21', 'fd22'] },
+        `a.fd11, a.fd12, b.fd21, b.fd22`,
+      ],
       [`should return '*' on empty array`, [], `*`],
       [`should return '*' on empty object`, {}, `*`],
       [`should return '*' on null`, null, `*`],

@@ -149,6 +149,23 @@ describe('sqler', function() {
         `SELECT fd1, fd2 AS b, fd3 AS c FROM tb1`,
       ],
 
+      // join + field
+      [
+        'JOIN + fields',
+        {
+          tb: { tb1: 'a' },
+          joins: [
+            {
+              type: 'left',
+              tb: { tb2: 'b' },
+              on: ['fd11', 'fd21'],
+            },
+          ],
+          fields: { a: ['fd11', 'fd12'], b: ['fd21', 'fd22'] },
+        },
+        `SELECT a.fd11, a.fd12, b.fd21, b.fd22 FROM tb1 AS a LEFT JOIN tb2 AS b ON a.fd11 = b.fd21`,
+      ],
+
       // WHERE clause examples
       [
         'wheres: string',
