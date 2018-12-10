@@ -89,6 +89,38 @@ describe('mysqlSqler', function() {
     });
   });
 
+  describe('pool.select(), selectRow(), selectValue()', function() {
+    let pool = null;
+    before(async function() {
+      pool = await sqler.createPool(opts);
+    });
+    after(async function() {
+      await pool.end();
+    });
+
+    const queryOpts = {
+      tb: 'tb_for_sqler_testing',
+    };
+    const expected = { fd1: 4, fd2: 'insert test' };
+
+    it('should return array of rows', async function() {
+      const result = await pool.select(queryOpts);
+
+      expect(result).to.have.length(1);
+      expect(result[0]).to.have.keys(expected);
+    });
+    it('should return a row', async function() {
+      const result = await pool.selectRow(queryOpts);
+
+      expect(result).to.be.an('object');
+      expect(result).to.have.keys(expected);
+    });
+    it('should return a value', async function() {
+      const result = await pool.selectValue(queryOpts);
+      expect(result).to.eql(expected.fd1);
+    });
+  });
+
   describe('pool.end()', function() {
     it('should throw error when querying after end() called', async function() {
       const pool = await sqler.createPool(opts);
