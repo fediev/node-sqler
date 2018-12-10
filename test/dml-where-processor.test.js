@@ -1,7 +1,7 @@
 /* eslint-disable prefer-arrow-callback, func-names */
 const { expect } = require('chai');
 const { firstObjectEntry } = require('../lib/util');
-const { subquery } = require('../lib/sqler-dml-builder');
+const { subquery } = require('../lib/dml-builder');
 const {
   where,
   whereNot,
@@ -16,7 +16,7 @@ const {
   whereExists,
   whereNotExists,
   or,
-} = require('../lib/sqler-where-processor');
+} = require('../lib/dml-where-processor');
 
 describe('SqlerWhereProcessor', function() {
   describe('where operator processors ', function() {

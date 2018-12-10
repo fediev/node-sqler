@@ -1,6 +1,6 @@
 /* eslint-disable prefer-arrow-callback, func-names */
 const { expect } = require('chai');
-const { select, subquery } = require('../lib/sqler-dml-builder');
+const { select, subquery } = require('../lib/dml-builder');
 const {
   where,
   whereNot,
@@ -16,7 +16,7 @@ const {
   whereNotExists,
   or,
   having,
-} = require('../lib/sqler-where-processor');
+} = require('../lib/dml-where-processor');
 
 describe('sqler', function() {
   describe('select()', function() {

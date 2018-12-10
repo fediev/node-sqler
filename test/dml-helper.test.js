@@ -11,8 +11,8 @@ const {
   sqlHaving,
   sqlOrderBy,
   sqlLimit,
-} = require('../lib/sqler-dml-helper');
-const { where, having } = require('../lib/sqler-where-processor');
+} = require('../lib/dml-helper');
+const { where, having } = require('../lib/dml-where-processor');
 
 describe('sqlerHelper', function() {
   describe('sqlTable()', function() {
