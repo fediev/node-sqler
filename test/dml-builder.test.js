@@ -1,6 +1,6 @@
 /* eslint-disable prefer-arrow-callback, func-names */
 const { expect } = require('chai');
-const { select, subquery } = require('../lib/dml-builder');
+const { select, subquery, union, unionAll } = require('../lib/dml-builder');
 const {
   where,
   whereNot,
@@ -422,5 +422,63 @@ describe('dml builder', function() {
       const expected = '(SELECT * FROM tb1)';
       expect(result).to.eql(expected);
     });
+  });
+
+  describe('union()', function() {
+    const tester = function([desc, queryOpts, expected]) {
+      it(desc, function() {
+        const result = union(queryOpts);
+        expect(result).to.eq(expected);
+      });
+    };
+
+    const testCases = [
+      [
+        'should return union sql of selects',
+        {
+          selects: [{ tb: 'tb1' }, { tb: 'tb2' }],
+        },
+        `SELECT * FROM tb1 UNION SELECT * FROM tb2`,
+      ],
+      [
+        'should return union sql of selects and orderBy',
+        {
+          selects: [{ tb: 'tb1' }, { tb: 'tb2' }],
+          orderBy: 'fd1',
+        },
+        `SELECT * FROM tb1 UNION SELECT * FROM tb2 ORDER BY fd1`,
+      ],
+    ];
+
+    testCases.forEach(tester);
+  });
+
+  describe('unionAll()', function() {
+    const tester = function([desc, queryOpts, expected]) {
+      it(desc, function() {
+        const result = unionAll(queryOpts);
+        expect(result).to.eq(expected);
+      });
+    };
+
+    const testCases = [
+      [
+        'should return union all sql of selects',
+        {
+          selects: [{ tb: 'tb1' }, { tb: 'tb2' }],
+        },
+        `SELECT * FROM tb1 UNION ALL SELECT * FROM tb2`,
+      ],
+      [
+        'should return union all sql of selects and orderBy',
+        {
+          selects: [{ tb: 'tb1' }, { tb: 'tb2' }],
+          orderBy: 'fd1',
+        },
+        `SELECT * FROM tb1 UNION ALL SELECT * FROM tb2 ORDER BY fd1`,
+      ],
+    ];
+
+    testCases.forEach(tester);
   });
 });
