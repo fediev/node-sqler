@@ -18,7 +18,7 @@ const {
   having,
 } = require('../lib/dml-where-processor');
 
-describe('sqler', function() {
+describe('dml builder', function() {
   describe('select()', function() {
     const tester = function([desc, queryOpts, expected]) {
       it(desc, function() {

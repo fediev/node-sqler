@@ -18,7 +18,7 @@ const {
   or,
 } = require('../lib/dml-where-processor');
 
-describe('SqlerWhereProcessor', function() {
+describe('dml builder where processor', function() {
   describe('where operator processors ', function() {
     const tester = function([desc, expr, expected]) {
       it(desc, function() {

@@ -14,7 +14,7 @@ const {
 } = require('../lib/dml-helper');
 const { where, having } = require('../lib/dml-where-processor');
 
-describe('sqlerHelper', function() {
+describe('dml builder helper', function() {
   describe('sqlTable()', function() {
     const tester = function([desc, expr, expected]) {
       it(desc, function() {
