@@ -107,13 +107,13 @@ describe('mysqlSqler', function() {
       const result = await pool.select(queryOpts);
 
       expect(result).to.have.length(1);
-      expect(result[0]).to.have.keys(expected);
+      expect(result[0]).to.include(expected);
     });
     it('should return a row', async function() {
       const result = await pool.selectRow(queryOpts);
 
       expect(result).to.be.an('object');
-      expect(result).to.have.keys(expected);
+      expect(result).to.include(expected);
     });
     it('should return a value', async function() {
       const result = await pool.selectValue(queryOpts);
@@ -198,6 +198,40 @@ describe('mysqlSqler', function() {
       expect(
         await mysqlSingleQuery(opts.connOpts, sqlCountRows)
       ).to.have.deep.property('results', [{ rowCount: initCountOfRows }]);
+    });
+  });
+
+  describe('pool.union(), unionAll()', function() {
+    let pool = null;
+    before(async function() {
+      pool = await sqler.createPool(opts);
+    });
+    after(async function() {
+      await pool.end();
+    });
+
+    it('should fetch union result', async function() {
+      const queryOpts = {
+        selects: [
+          { tb: 'tb_for_sqler_testing' },
+          { tb: 'tb_for_sqler_testing' },
+        ],
+      };
+      const result = await pool.union(queryOpts);
+      expect(result).to.have.length(2);
+      expect(result[0]).to.include({ fd1: 4, fd2: 'insert test' });
+    });
+
+    it('should fetch union all result', async function() {
+      const queryOpts = {
+        selects: [
+          { tb: 'tb_for_sqler_testing' },
+          { tb: 'tb_for_sqler_testing' },
+        ],
+      };
+      const result = await pool.unionAll(queryOpts);
+      expect(result).to.have.length(4);
+      expect(result[0]).to.include({ fd1: 4, fd2: 'insert test' });
     });
   });
 });
