@@ -1,6 +1,12 @@
 /* eslint-disable prefer-arrow-callback, func-names */
 const { expect } = require('chai');
-const { select, subquery, union, unionAll } = require('../lib/dml-builder');
+const {
+  select,
+  subquery,
+  union,
+  unionAll,
+  delete: del,
+} = require('../lib/dml-builder');
 const {
   where,
   whereNot,
@@ -476,6 +482,38 @@ describe('dml builder', function() {
           orderBy: 'fd1',
         },
         `SELECT * FROM tb1 UNION ALL SELECT * FROM tb2 ORDER BY fd1`,
+      ],
+    ];
+
+    testCases.forEach(tester);
+  });
+
+  describe('delete()', function() {
+    const tester = function([desc, queryOpts, expected]) {
+      it(desc, function() {
+        const result = del(queryOpts);
+        expect(result).to.eq(expected);
+      });
+    };
+
+    const testCases = [
+      [
+        'should return delete sql',
+        {
+          tb: 'tb1',
+          wheres: { fd1: 1 },
+        },
+        `DELETE FROM tb1 WHERE fd1 = 1`,
+      ],
+      [
+        'should return delete sql with orderBy and limit',
+        {
+          tb: 'tb1',
+          wheres: { fd1: 1 },
+          orderBy: 'fd1',
+          limit: 5,
+        },
+        `DELETE FROM tb1 WHERE fd1 = 1 ORDER BY fd1 LIMIT 5`,
       ],
     ];
 
