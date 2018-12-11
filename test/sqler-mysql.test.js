@@ -14,18 +14,16 @@ const sqlCreateTable = `
   )
 `;
 
-const sqlDropTable = `
-  DROP TABLE tb_for_sqler_testing
-`;
+const sqlDropTable = `DROP TABLE tb_for_sqler_testing`;
 
 const sqlInsertRows = `
   INSERT tb_for_sqler_testing (fd2)
     VALUES ('item1'), ('item2'), ('item3')
 `;
 
-const sqlTruncateTable = `
-  TRUNCATE TABLE tb_for_sqler_testing
-`;
+const sqlTruncateTable = `TRUNCATE TABLE tb_for_sqler_testing`;
+
+const sqlCountRows = `SELECT COUNT(*) AS rowCount FROM tb_for_sqler_testing`;
 
 // ---------------------------------------------------------------------
 
@@ -164,7 +162,6 @@ describe('mysqlSqler', function() {
     after(async function() {
       await pool.end();
     });
-    const sqlCountRows = `SELECT COUNT(*) AS rowCount FROM tb_for_sqler_testing`;
     const sqlInsertARow = `INSERT tb_for_sqler_testing (fd2) VALUES ('trx test')`;
 
     it('should insert a row after commit', async function() {
@@ -269,6 +266,40 @@ describe('mysqlSqler', function() {
       const result = await pool.unionAll(queryOpts);
       expect(result).to.have.length(initRowCount * 2);
       expect(result[0]).to.include(lastRow);
+    });
+  });
+
+  describe('pool.delete()', function() {
+    let pool = null;
+    before(async function() {
+      pool = await sqler.createPool(opts);
+    });
+    after(async function() {
+      await pool.end();
+    });
+
+    it('should delete all rows', async function() {
+      const queryOpts = {
+        tb: 'tb_for_sqler_testing',
+      };
+      const result = await pool.delete(queryOpts);
+
+      expect(result).to.include({ affectedRows: initRowCount });
+      expect(
+        await mysqlSingleQuery(opts.connOpts, sqlCountRows)
+      ).to.have.deep.property('results', [{ rowCount: 0 }]);
+    });
+    it('should delete selected rows', async function() {
+      const queryOpts = {
+        tb: 'tb_for_sqler_testing',
+        wheres: `fd2 <> 'item2'`,
+      };
+      const result = await pool.delete(queryOpts);
+
+      expect(result).to.include({ affectedRows: initRowCount - 1 });
+      expect(
+        await mysqlSingleQuery(opts.connOpts, sqlCountRows)
+      ).to.have.deep.property('results', [{ rowCount: 1 }]);
     });
   });
 });
