@@ -23,6 +23,10 @@ const sqlInsertRows = `
     VALUES ('item1'), ('item2'), ('item3')
 `;
 
+const sqlTruncateTable = `
+  TRUNCATE TABLE tb_for_sqler_testing
+`;
+
 // ---------------------------------------------------------------------
 
 describe('mysqlSqler', function() {
@@ -34,18 +38,24 @@ describe('mysqlSqler', function() {
       if (e.code !== 'ER_BAD_TABLE_ERROR') {
         console.warn('[WARN] testing mysql sqler skipped');
         console.warn('[WARN]   reason :', e.sqlMessage || e.code || e);
-        // TODO: this.skip() does not work. seems like mocha issue.
+        // FIXME: this.skip() does not work. seems like mocha issue.
         this.skip();
         return;
       }
     }
-
     await mysqlSingleQuery(opts.connOpts, sqlCreateTable);
-    await mysqlSingleQuery(opts.connOpts, sqlInsertRows);
   });
   after('drop test table', async function() {
     await mysqlSingleQuery(opts.connOpts, sqlDropTable);
   });
+  beforeEach('reset test table', async function() {
+    await mysqlSingleQuery(opts.connOpts, sqlTruncateTable);
+    await mysqlSingleQuery(opts.connOpts, sqlInsertRows);
+  });
+
+  const initRowCount = 3;
+  const firstRow = { fd1: 1, fd2: 'item1' };
+  const lastRow = { fd1: 3, fd2: 'item3' };
 
   describe('pool.query()', function() {
     let pool = null;
@@ -60,32 +70,41 @@ describe('mysqlSqler', function() {
       const sql = `SELECT * FROM tb_for_sqler_testing`;
       const { results } = await pool.query(sql);
 
-      expect(results).to.be.length(3);
-      expect(results[0].fd2).to.eql('item1');
+      expect(results).to.be.length(initRowCount);
+      expect(results[0]).to.include(firstRow);
     });
     it('should insert a row', async function() {
       const sql = `INSERT tb_for_sqler_testing (fd2) VALUES ('insert test')`;
+      const expected = {
+        affectedRows: 1,
+        insertId: initRowCount + 1,
+        changedRows: 0,
+      };
       const { results } = await pool.query(sql);
 
-      expect(results.affectedRows).to.eql(1);
-      expect(results.insertId).to.eql(4);
-      expect(results.changedRows).to.eql(0);
+      expect(results).to.include(expected);
     });
     it('should update rows', async function() {
       const sql = `UPDATE tb_for_sqler_testing SET fd2 = 'item2' WHERE fd2 LIKE 'item%'`;
+      const expected = {
+        affectedRows: initRowCount,
+        insertId: 0,
+        changedRows: initRowCount - 1,
+      };
       const { results } = await pool.query(sql);
 
-      expect(results.affectedRows).to.eql(3);
-      expect(results.insertId).to.eql(0);
-      expect(results.changedRows).to.eql(2);
+      expect(results).to.include(expected);
     });
     it('should delete rows', async function() {
       const sql = `DELETE FROM tb_for_sqler_testing WHERE fd2 LIKE 'item%'`;
+      const expected = {
+        affectedRows: initRowCount,
+        insertId: 0,
+        changedRows: 0,
+      };
       const { results } = await pool.query(sql);
 
-      expect(results.affectedRows).to.eql(3);
-      expect(results.insertId).to.eql(0);
-      expect(results.changedRows).to.eql(0);
+      expect(results).to.include(expected);
     });
   });
 
@@ -101,23 +120,22 @@ describe('mysqlSqler', function() {
     const queryOpts = {
       tb: 'tb_for_sqler_testing',
     };
-    const expected = { fd1: 4, fd2: 'insert test' };
 
     it('should return array of rows', async function() {
       const result = await pool.select(queryOpts);
 
-      expect(result).to.have.length(1);
-      expect(result[0]).to.include(expected);
+      expect(result).to.have.length(initRowCount);
+      expect(result[0]).to.include(firstRow);
     });
     it('should return a row', async function() {
       const result = await pool.selectRow(queryOpts);
 
       expect(result).to.be.an('object');
-      expect(result).to.include(expected);
+      expect(result).to.include(firstRow);
     });
     it('should return a value', async function() {
       const result = await pool.selectValue(queryOpts);
-      expect(result).to.eql(expected.fd1);
+      expect(result).to.eql(firstRow.fd1);
     });
   });
 
@@ -150,54 +168,49 @@ describe('mysqlSqler', function() {
     const sqlInsertARow = `INSERT tb_for_sqler_testing (fd2) VALUES ('trx test')`;
 
     it('should insert a row after commit', async function() {
-      const { results } = await mysqlSingleQuery(opts.connOpts, sqlCountRows);
-      const initCountOfRows = results[0].rowCount;
-
       const trx = await pool.begin();
       await trx.query(sqlInsertARow);
 
       // in transaction, the row count increases
       expect(await trx.query(sqlCountRows)).to.have.deep.property('results', [
-        { rowCount: initCountOfRows + 1 },
+        { rowCount: initRowCount + 1 },
       ]);
       // but the row count does not increase outside of the transaction
       expect(
         await mysqlSingleQuery(opts.connOpts, sqlCountRows)
-      ).to.have.deep.property('results', [{ rowCount: initCountOfRows }]);
+      ).to.have.deep.property('results', [{ rowCount: initRowCount }]);
 
       trx.commit();
 
       // after commit, the row count increases to 4 outside of the transaction too.
       expect(
         await mysqlSingleQuery(opts.connOpts, sqlCountRows)
-      ).to.have.deep.property('results', [{ rowCount: initCountOfRows + 1 }]);
+      ).to.have.deep.property('results', [{ rowCount: initRowCount + 1 }]);
     });
 
     it('should not insert a row when rollback', async function() {
-      const { results } = await mysqlSingleQuery(opts.connOpts, sqlCountRows);
-      const initCountOfRows = results[0].rowCount;
       const trx = await pool.begin();
       await trx.query(sqlInsertARow);
 
       // in transaction, the row count increases
       expect(await trx.query(sqlCountRows)).to.have.deep.property('results', [
-        { rowCount: initCountOfRows + 1 },
+        { rowCount: initRowCount + 1 },
       ]);
       // but the row count does not increase outside of the transaction
       expect(
         await mysqlSingleQuery(opts.connOpts, sqlCountRows)
-      ).to.have.deep.property('results', [{ rowCount: initCountOfRows }]);
+      ).to.have.deep.property('results', [{ rowCount: initRowCount }]);
 
       trx.rollback();
 
       // after rollback, the row count decrease back to init count
       expect(await trx.query(sqlCountRows)).to.have.deep.property('results', [
-        { rowCount: initCountOfRows },
+        { rowCount: initRowCount },
       ]);
       // the row count does not change outside of the transaction
       expect(
         await mysqlSingleQuery(opts.connOpts, sqlCountRows)
-      ).to.have.deep.property('results', [{ rowCount: initCountOfRows }]);
+      ).to.have.deep.property('results', [{ rowCount: initRowCount }]);
     });
   });
 
@@ -210,7 +223,7 @@ describe('mysqlSqler', function() {
       await pool.end();
     });
 
-    it('should fetch union result', async function() {
+    it('should fetch union query result', async function() {
       const queryOpts = {
         selects: [
           { tb: 'tb_for_sqler_testing' },
@@ -218,11 +231,23 @@ describe('mysqlSqler', function() {
         ],
       };
       const result = await pool.union(queryOpts);
-      expect(result).to.have.length(2);
-      expect(result[0]).to.include({ fd1: 4, fd2: 'insert test' });
+      expect(result).to.have.length(initRowCount);
+      expect(result[0]).to.include(firstRow);
+    });
+    it('should fetch ordered union query result ', async function() {
+      const queryOpts = {
+        selects: [
+          { tb: 'tb_for_sqler_testing' },
+          { tb: 'tb_for_sqler_testing' },
+        ],
+        orderBy: 'fd1 DESC',
+      };
+      const result = await pool.union(queryOpts);
+      expect(result).to.have.length(initRowCount);
+      expect(result[0]).to.include(lastRow);
     });
 
-    it('should fetch union all result', async function() {
+    it('should fetch union all query result', async function() {
       const queryOpts = {
         selects: [
           { tb: 'tb_for_sqler_testing' },
@@ -230,8 +255,20 @@ describe('mysqlSqler', function() {
         ],
       };
       const result = await pool.unionAll(queryOpts);
-      expect(result).to.have.length(4);
-      expect(result[0]).to.include({ fd1: 4, fd2: 'insert test' });
+      expect(result).to.have.length(initRowCount * 2);
+      expect(result[0]).to.include(firstRow);
+    });
+    it('should fetch ordered union all query result', async function() {
+      const queryOpts = {
+        selects: [
+          { tb: 'tb_for_sqler_testing' },
+          { tb: 'tb_for_sqler_testing' },
+        ],
+        orderBy: 'fd1 DESC',
+      };
+      const result = await pool.unionAll(queryOpts);
+      expect(result).to.have.length(initRowCount * 2);
+      expect(result[0]).to.include(lastRow);
     });
   });
 });
