@@ -1,15 +1,16 @@
 {
   "name": "sqler",
-  "version": "0.1.0",
-  "description": "Simple SQL DML builder",
-  "main": "index.js",
+  "version": "0.2.0",
+  "description": "Simple SQL DML builder and query helper",
+  "main": "lib/sqler.js",
   "scripts": {
     "test": "mocha",
     "test:watch": "mocha --watch --reporter dot"
   },
   "repository": "fediev/node-sqler",
   "keywords": [
-    "SQL"
+    "SQL",
+    "mysql"
   ],
   "author": "fediev <fediev@gmail.com>",
   "license": "MIT",
