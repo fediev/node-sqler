@@ -5,6 +5,8 @@ const {
   subquery,
   union,
   unionAll,
+  insert,
+  update,
   delete: del,
 } = require('../lib/dml-builder');
 const {
@@ -483,6 +485,36 @@ describe('dml builder', function() {
         },
         `SELECT * FROM tb1 UNION ALL SELECT * FROM tb2 ORDER BY fd1`,
       ],
+    ];
+
+    testCases.forEach(tester);
+  });
+
+  describe('insert()', function() {
+    const tester = function([desc, queryOpts, expected]) {
+      it(desc, function() {
+        const result = insert(queryOpts);
+        expect(result).to.eq(expected);
+      });
+    };
+
+    const testCases = [
+      //
+    ];
+
+    testCases.forEach(tester);
+  });
+
+  describe('update()', function() {
+    const tester = function([desc, queryOpts, expected]) {
+      it(desc, function() {
+        const result = update(queryOpts);
+        expect(result).to.eq(expected);
+      });
+    };
+
+    const testCases = [
+      //
     ];
 
     testCases.forEach(tester);
