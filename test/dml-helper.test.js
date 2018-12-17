@@ -11,6 +11,7 @@ const {
   sqlHaving,
   sqlOrderBy,
   sqlLimit,
+  sqlInsertInfo,
 } = require('../lib/dml-helper');
 const { where, having } = require('../lib/dml-where-processor');
 
@@ -378,6 +379,63 @@ describe('dml builder helper', function() {
       ['should return empty string on empty array', [], ''],
       ['should return empty string on invalid object', { offset: 2 }, ''],
       ['should return empty string on null', null, ''],
+    ];
+
+    testCases.forEach(tester);
+  });
+
+  describe('sqlInsertInfo()', function() {
+    const tester = function([
+      desc,
+      infos,
+      { insertFields: expectedFields, insertValues: expectedValues },
+    ]) {
+      it(desc, function() {
+        const {
+          insertFields: resultFields,
+          insertValues: resultValues,
+        } = sqlInsertInfo(infos);
+        expect(resultFields).to.eq(expectedFields);
+        expect(resultValues).to.eq(expectedValues);
+      });
+    };
+
+    const testCases = [
+      // [description, expression, expected result]
+      [
+        'object infos',
+        { fd1: 1, fd2: 'a', fd3: () => 'NOW()' },
+        { insertFields: `(fd1, fd2, fd3)`, insertValues: `(1, 'a', NOW())` },
+      ],
+      [
+        'array of object infos with same format',
+        [{ fd1: 1, fd2: 'a' }, { fd1: 2, fd2: () => 'NOW()' }],
+        { insertFields: `(fd1, fd2)`, insertValues: `(1, 'a'), (2, NOW())` },
+      ],
+      [
+        'array of object infos with diffent format',
+        [{ fd1: 1, fd2: 'a' }, { fd1: 2, fd3: () => 'NOW()' }],
+        {
+          insertFields: `(fd1, fd2, fd3)`,
+          insertValues: `(1, 'a', DEFAULT), (2, DEFAULT, NOW())`,
+        },
+      ],
+      [
+        'array of non object infos',
+        [1, 'a', () => 'NOW()'],
+        {
+          insertFields: '',
+          insertValues: `(1, 'a', NOW())`,
+        },
+      ],
+      [
+        'array of non object array infos',
+        [[1, 'a'], [2, () => 'NOW()']],
+        {
+          insertFields: '',
+          insertValues: `(1, 'a'), (2, NOW())`,
+        },
+      ],
     ];
 
     testCases.forEach(tester);
