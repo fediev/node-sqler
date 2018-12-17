@@ -179,6 +179,31 @@ describe('mysqlSqler', function() {
     });
   });
 
+  describe('pool.update()', function() {
+    let pool = null;
+    before(async function() {
+      pool = await sqler.createPool(opts);
+    });
+    after(async function() {
+      await pool.end();
+    });
+
+    it('should update a row', async function() {
+      const queryOpts = {
+        tb: 'tb_for_sqler_testing',
+        infos: { fd2: 'item2' },
+      };
+      const expected = {
+        affectedRows: initRowCount,
+        insertId: 0,
+        changedRows: initRowCount - 1,
+      };
+      const result = await pool.update(queryOpts);
+
+      expect(result).to.include(expected);
+    });
+  });
+
   describe('pool.end()', function() {
     it('should throw error when querying after end() called', async function() {
       const pool = await sqler.createPool(opts);
