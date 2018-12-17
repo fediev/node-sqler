@@ -55,6 +55,23 @@ describe('mysqlSqler', function() {
   const firstRow = { fd1: 1, fd2: 'item1' };
   const lastRow = { fd1: 3, fd2: 'item3' };
 
+  describe('pool.end()', function() {
+    it('should throw error when querying after end() called', async function() {
+      const pool = await sqler.createPool(opts);
+      let isThrown = false;
+      try {
+        await pool.end();
+        await pool.query('SELECT 1');
+      } catch (e) {
+        isThrown = true;
+        expect(e.code).to.eql('POOL_CLOSED');
+      } finally {
+        // eslint-disable-next-line no-unused-expressions
+        expect(isThrown).to.be.true;
+      }
+    });
+  });
+
   describe('pool.query()', function() {
     let pool = null;
     before(async function() {
@@ -137,6 +154,64 @@ describe('mysqlSqler', function() {
     });
   });
 
+  describe('pool.union(), unionAll()', function() {
+    let pool = null;
+    before(async function() {
+      pool = await sqler.createPool(opts);
+    });
+    after(async function() {
+      await pool.end();
+    });
+
+    it('should fetch union query result', async function() {
+      const queryOpts = {
+        selects: [
+          { tb: 'tb_for_sqler_testing' },
+          { tb: 'tb_for_sqler_testing' },
+        ],
+      };
+      const result = await pool.union(queryOpts);
+      expect(result).to.have.length(initRowCount);
+      expect(result[0]).to.include(firstRow);
+    });
+    it('should fetch ordered union query result ', async function() {
+      const queryOpts = {
+        selects: [
+          { tb: 'tb_for_sqler_testing' },
+          { tb: 'tb_for_sqler_testing' },
+        ],
+        orderBy: 'fd1 DESC',
+      };
+      const result = await pool.union(queryOpts);
+      expect(result).to.have.length(initRowCount);
+      expect(result[0]).to.include(lastRow);
+    });
+
+    it('should fetch union all query result', async function() {
+      const queryOpts = {
+        selects: [
+          { tb: 'tb_for_sqler_testing' },
+          { tb: 'tb_for_sqler_testing' },
+        ],
+      };
+      const result = await pool.unionAll(queryOpts);
+      expect(result).to.have.length(initRowCount * 2);
+      expect(result[0]).to.include(firstRow);
+    });
+    it('should fetch ordered union all query result', async function() {
+      const queryOpts = {
+        selects: [
+          { tb: 'tb_for_sqler_testing' },
+          { tb: 'tb_for_sqler_testing' },
+        ],
+        orderBy: 'fd1 DESC',
+      };
+      const result = await pool.unionAll(queryOpts);
+      expect(result).to.have.length(initRowCount * 2);
+      expect(result[0]).to.include(lastRow);
+    });
+  });
+
   describe('pool.insert()', function() {
     let pool = null;
     before(async function() {
@@ -204,20 +279,37 @@ describe('mysqlSqler', function() {
     });
   });
 
-  describe('pool.end()', function() {
-    it('should throw error when querying after end() called', async function() {
-      const pool = await sqler.createPool(opts);
-      let isThrown = false;
-      try {
-        await pool.end();
-        await pool.query('SELECT 1');
-      } catch (e) {
-        isThrown = true;
-        expect(e.code).to.eql('POOL_CLOSED');
-      } finally {
-        // eslint-disable-next-line no-unused-expressions
-        expect(isThrown).to.be.true;
-      }
+  describe('pool.delete()', function() {
+    let pool = null;
+    before(async function() {
+      pool = await sqler.createPool(opts);
+    });
+    after(async function() {
+      await pool.end();
+    });
+
+    it('should delete all rows', async function() {
+      const queryOpts = {
+        tb: 'tb_for_sqler_testing',
+      };
+      const result = await pool.delete(queryOpts);
+
+      expect(result).to.include({ affectedRows: initRowCount });
+      expect(
+        await mysqlSingleQuery(opts.connOpts, sqlCountRows)
+      ).to.have.deep.property('results', [{ rowCount: 0 }]);
+    });
+    it('should delete selected rows', async function() {
+      const queryOpts = {
+        tb: 'tb_for_sqler_testing',
+        wheres: `fd2 <> 'item2'`,
+      };
+      const result = await pool.delete(queryOpts);
+
+      expect(result).to.include({ affectedRows: initRowCount - 1 });
+      expect(
+        await mysqlSingleQuery(opts.connOpts, sqlCountRows)
+      ).to.have.deep.property('results', [{ rowCount: 1 }]);
     });
   });
 
@@ -275,98 +367,6 @@ describe('mysqlSqler', function() {
       expect(
         await mysqlSingleQuery(opts.connOpts, sqlCountRows)
       ).to.have.deep.property('results', [{ rowCount: initRowCount }]);
-    });
-  });
-
-  describe('pool.union(), unionAll()', function() {
-    let pool = null;
-    before(async function() {
-      pool = await sqler.createPool(opts);
-    });
-    after(async function() {
-      await pool.end();
-    });
-
-    it('should fetch union query result', async function() {
-      const queryOpts = {
-        selects: [
-          { tb: 'tb_for_sqler_testing' },
-          { tb: 'tb_for_sqler_testing' },
-        ],
-      };
-      const result = await pool.union(queryOpts);
-      expect(result).to.have.length(initRowCount);
-      expect(result[0]).to.include(firstRow);
-    });
-    it('should fetch ordered union query result ', async function() {
-      const queryOpts = {
-        selects: [
-          { tb: 'tb_for_sqler_testing' },
-          { tb: 'tb_for_sqler_testing' },
-        ],
-        orderBy: 'fd1 DESC',
-      };
-      const result = await pool.union(queryOpts);
-      expect(result).to.have.length(initRowCount);
-      expect(result[0]).to.include(lastRow);
-    });
-
-    it('should fetch union all query result', async function() {
-      const queryOpts = {
-        selects: [
-          { tb: 'tb_for_sqler_testing' },
-          { tb: 'tb_for_sqler_testing' },
-        ],
-      };
-      const result = await pool.unionAll(queryOpts);
-      expect(result).to.have.length(initRowCount * 2);
-      expect(result[0]).to.include(firstRow);
-    });
-    it('should fetch ordered union all query result', async function() {
-      const queryOpts = {
-        selects: [
-          { tb: 'tb_for_sqler_testing' },
-          { tb: 'tb_for_sqler_testing' },
-        ],
-        orderBy: 'fd1 DESC',
-      };
-      const result = await pool.unionAll(queryOpts);
-      expect(result).to.have.length(initRowCount * 2);
-      expect(result[0]).to.include(lastRow);
-    });
-  });
-
-  describe('pool.delete()', function() {
-    let pool = null;
-    before(async function() {
-      pool = await sqler.createPool(opts);
-    });
-    after(async function() {
-      await pool.end();
-    });
-
-    it('should delete all rows', async function() {
-      const queryOpts = {
-        tb: 'tb_for_sqler_testing',
-      };
-      const result = await pool.delete(queryOpts);
-
-      expect(result).to.include({ affectedRows: initRowCount });
-      expect(
-        await mysqlSingleQuery(opts.connOpts, sqlCountRows)
-      ).to.have.deep.property('results', [{ rowCount: 0 }]);
-    });
-    it('should delete selected rows', async function() {
-      const queryOpts = {
-        tb: 'tb_for_sqler_testing',
-        wheres: `fd2 <> 'item2'`,
-      };
-      const result = await pool.delete(queryOpts);
-
-      expect(result).to.include({ affectedRows: initRowCount - 1 });
-      expect(
-        await mysqlSingleQuery(opts.connOpts, sqlCountRows)
-      ).to.have.deep.property('results', [{ rowCount: 1 }]);
     });
   });
 });
