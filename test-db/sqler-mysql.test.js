@@ -137,6 +137,48 @@ describe('mysqlSqler', function() {
     });
   });
 
+  describe('pool.insert()', function() {
+    let pool = null;
+    before(async function() {
+      pool = await sqler.createPool(opts);
+    });
+    after(async function() {
+      await pool.end();
+    });
+
+    it('should insert a row', async function() {
+      const queryOpts = {
+        tb: 'tb_for_sqler_testing',
+        infos: { fd2: 'inserted by insert() #1' },
+      };
+      const expected = {
+        affectedRows: 1,
+        insertId: initRowCount + 1,
+        changedRows: 0,
+      };
+      const result = await pool.insert(queryOpts);
+
+      expect(result).to.include(expected);
+    });
+    it('should insert multiple rows', async function() {
+      const queryOpts = {
+        tb: 'tb_for_sqler_testing',
+        infos: [
+          { fd2: 'inserted by insert() #1' },
+          { fd2: 'inserted by insert() #2' },
+        ],
+      };
+      const expected = {
+        affectedRows: 2,
+        insertId: initRowCount + 1,
+        changedRows: 0,
+      };
+      const result = await pool.insert(queryOpts);
+
+      expect(result).to.include(expected);
+    });
+  });
+
   describe('pool.end()', function() {
     it('should throw error when querying after end() called', async function() {
       const pool = await sqler.createPool(opts);
