@@ -12,6 +12,7 @@ const {
   sqlOrderBy,
   sqlLimit,
   sqlInsertInfo,
+  sqlUpdateInfos,
 } = require('../lib/dml-helper');
 const { where, having } = require('../lib/dml-where-processor');
 
@@ -435,6 +436,51 @@ describe('dml builder helper', function() {
           insertFields: '',
           insertValues: `(1, 'a'), (2, NOW())`,
         },
+      ],
+    ];
+
+    testCases.forEach(tester);
+  });
+
+  describe('sqlUpdateInfos()', function() {
+    const tester = function([desc, expr, expected]) {
+      it(desc, function() {
+        const result = sqlUpdateInfos(expr);
+        expect(result).to.eq(expected);
+      });
+    };
+
+    const testCases = [
+      // [description, expression, expected result]
+      [
+        'should return string as it is',
+        `  fd1 = 1, fd2 = 'a', fd3 = NOW()  `,
+        `fd1 = 1, fd2 = 'a', fd3 = NOW()`,
+      ],
+      [
+        'should return string as it is',
+        {
+          fd1: 1,
+          fd2: 'a',
+          fd3: () => 'NOW()',
+        },
+        `fd1 = 1, fd2 = 'a', fd3 = NOW()`,
+      ],
+      [
+        'should return string as it is',
+        ['fd1 = 1', `fd2 = 'a'`, 'fd3 = NOW()'],
+        `fd1 = 1, fd2 = 'a', fd3 = NOW()`,
+      ],
+      [
+        'should return string as it is',
+        [
+          'fd1 = 1',
+          {
+            fd2: 'a',
+            fd3: () => 'NOW()',
+          },
+        ],
+        `fd1 = 1, fd2 = 'a', fd3 = NOW()`,
       ],
     ];
 
