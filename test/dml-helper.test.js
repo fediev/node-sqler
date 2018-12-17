@@ -11,7 +11,7 @@ const {
   sqlHaving,
   sqlOrderBy,
   sqlLimit,
-  sqlInsertInfo,
+  sqlInsertInfos,
   sqlUpdateInfos,
 } = require('../lib/dml-helper');
 const { where, having } = require('../lib/dml-where-processor');
@@ -385,7 +385,7 @@ describe('dml builder helper', function() {
     testCases.forEach(tester);
   });
 
-  describe('sqlInsertInfo()', function() {
+  describe('sqlInsertInfos()', function() {
     const tester = function([
       desc,
       infos,
@@ -395,7 +395,7 @@ describe('dml builder helper', function() {
         const {
           insertFields: resultFields,
           insertValues: resultValues,
-        } = sqlInsertInfo(infos);
+        } = sqlInsertInfos(infos);
         expect(resultFields).to.eq(expectedFields);
         expect(resultValues).to.eq(expectedValues);
       });
