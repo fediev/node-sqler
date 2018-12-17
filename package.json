@@ -4,8 +4,11 @@
   "description": "Simple SQL DML builder and query helper",
   "main": "lib/sqler.js",
   "scripts": {
-    "test": "mocha",
-    "test:watch": "mocha --watch --reporter dot"
+    "test": "mocha ./test",
+    "test:watch": "mocha --watch --reporter dot ./test",
+    "test-all": "mocha ./test ./test-db",
+    "test-db": "mocha ./test-db",
+    "test-db:watch": "mocha --watch --reporter dot  ./test-db"
   },
   "repository": "fediev/node-sqler",
   "keywords": [
