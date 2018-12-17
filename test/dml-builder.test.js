@@ -520,6 +520,69 @@ describe('dml builder', function() {
     testCases.forEach(tester);
   });
 
+  describe('insert()', function() {
+    const tester = function([desc, queryOpts, expected]) {
+      it(desc, function() {
+        const result = insert(queryOpts);
+        expect(result).to.eq(expected);
+      });
+    };
+
+    const testCases = [
+      [
+        'should return insert sql',
+        {
+          tb: 'tb1',
+          infos: { fd1: 1, fd2: 'a', fd3: () => 'NOW()' },
+        },
+        `INSERT INTO tb1 (fd1, fd2, fd3) VALUES (1, 'a', NOW())`,
+      ],
+      [
+        'should return insert sql',
+        {
+          tb: 'tb1',
+          infos: [{ fd1: 1, fd2: 'a' }, { fd1: 2, fd2: () => 'NOW()' }],
+        },
+        `INSERT INTO tb1 (fd1, fd2) VALUES (1, 'a'), (2, NOW())`,
+      ],
+      [
+        'should return insert sql',
+        {
+          tb: 'tb1',
+          infos: [{ fd1: 1, fd2: 'a' }, { fd1: 2, fd3: () => 'NOW()' }],
+        },
+        `INSERT INTO tb1 (fd1, fd2, fd3) VALUES (1, 'a', DEFAULT), (2, DEFAULT, NOW())`,
+      ],
+      [
+        'should return insert sql',
+        {
+          tb: 'tb1',
+          infos: [1, 'a', () => 'NOW()'],
+        },
+        `INSERT INTO tb1 VALUES (1, 'a', NOW())`,
+      ],
+      [
+        'should return insert sql',
+        {
+          tb: 'tb1',
+          infos: [[1, 'a'], [2, () => 'NOW()']],
+        },
+        `INSERT INTO tb1 VALUES (1, 'a'), (2, NOW())`,
+      ],
+      [
+        'should return insert sql',
+        {
+          tb: 'tb1',
+          fields: 'fd1, fd2, fd3',
+          values: `1, 'a', NOW()`,
+        },
+        `INSERT INTO tb1 (fd1, fd2, fd3) VALUES (1, 'a', NOW())`,
+      ],
+    ];
+
+    testCases.forEach(tester);
+  });
+
   describe('delete()', function() {
     const tester = function([desc, queryOpts, expected]) {
       it(desc, function() {
