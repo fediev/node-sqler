@@ -583,6 +583,63 @@ describe('dml builder', function() {
     testCases.forEach(tester);
   });
 
+  describe('update()', function() {
+    const tester = function([desc, queryOpts, expected]) {
+      it(desc, function() {
+        const result = update(queryOpts);
+        expect(result).to.eq(expected);
+      });
+    };
+
+    const testCases = [
+      [
+        'should return update sql from object',
+        {
+          tb: 'tb1',
+          infos: { fd1: 1, fd2: 'a', fd3: () => 'NOW()' },
+        },
+        `UPDATE tb1 SET fd1 = 1, fd2 = 'a', fd3 = NOW()`,
+      ],
+      [
+        'should return update sql from string',
+        {
+          tb: 'tb1',
+          infos: `fd1 = 1, fd2 = 'a', fd3 = NOW()`,
+        },
+        `UPDATE tb1 SET fd1 = 1, fd2 = 'a', fd3 = NOW()`,
+      ],
+      [
+        'should return update sql from array of string',
+        {
+          tb: 'tb1',
+          infos: ['fd1 = 1', `fd2 = 'a'`, 'fd3 = NOW()'],
+        },
+        `UPDATE tb1 SET fd1 = 1, fd2 = 'a', fd3 = NOW()`,
+      ],
+      [
+        'should return update sql from array of string and object',
+        {
+          tb: 'tb1',
+          infos: ['fd1 = 1', { fd2: 'a', fd3: () => 'NOW()' }],
+        },
+        `UPDATE tb1 SET fd1 = 1, fd2 = 'a', fd3 = NOW()`,
+      ],
+      [
+        'should return update sql with where, order by and limit',
+        {
+          tb: 'tb1',
+          infos: { fd1: 1, fd2: 'a', fd3: () => 'NOW()' },
+          wheres: { fd1: 2, fd2: 'b' },
+          orderBy: ['fd1', 'fd2'],
+          limit: 10,
+        },
+        `UPDATE tb1 SET fd1 = 1, fd2 = 'a', fd3 = NOW() WHERE fd1 = 2 AND fd2 = 'b' ORDER BY fd1, fd2 LIMIT 10`,
+      ],
+    ];
+
+    testCases.forEach(tester);
+  });
+
   describe('delete()', function() {
     const tester = function([desc, queryOpts, expected]) {
       it(desc, function() {
