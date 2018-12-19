@@ -427,8 +427,8 @@ describe('dml builder', function() {
     testCases.forEach(tester);
 
     it('should throw when table is not supplied', function() {
-      expect(() => select()).to.throw('NO_TABLE_SUPPLIED');
-      expect(() => select({ fields: 'fd1' })).to.throw('NO_TABLE_SUPPLIED');
+      expect(() => select()).to.throw('INVALID_TABLE_NAME');
+      expect(() => select({ fields: 'fd1' })).to.throw('INVALID_TABLE_NAME');
     });
   });
 

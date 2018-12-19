@@ -28,20 +28,23 @@ describe('dml builder helper', function() {
 
     const testCases = [
       // [description, expression, expected result]
-      ['should get table name on string', ' tb1 ', 'tb1'],
-      ['should get table name with alias on object', { tb1: 'a' }, `tb1 AS a`],
+      ['string --> trimmed string', ' tb1 ', 'tb1'],
+      ['object --> table name with alias', { tb1: 'a' }, `tb1 AS a`],
     ];
 
     testCases.forEach(tester);
 
     it('should throw when no table name supplied', function() {
-      expect(() => sqlTable()).to.throw('NO_TABLE_SUPPLIED');
+      expect(() => sqlTable()).to.throw('INVALID_TABLE_NAME');
     });
     it('should throw on empty object', function() {
       expect(() => sqlTable({})).to.throw('NO_OBJECT_ENTRY');
     });
     it('should throw on null', function() {
       expect(() => sqlTable({})).to.throw('NO_OBJECT_ENTRY');
+    });
+    it('should throw when tb is not string or object', function() {
+      expect(() => sqlTable(1)).to.throw('INVALID_TABLE_NAME');
     });
   });
 
