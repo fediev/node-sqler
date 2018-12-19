@@ -199,9 +199,13 @@ describe('dml builder helper', function() {
         ` fd1 = 1 AND fd2 = 'a' `,
         `WHERE fd1 = 1 AND fd2 = 'a'`,
       ],
-      ['should process function', where('fd1', '=', 'a'), `WHERE fd1 = 'a'`],
       [
-        'should process simple value in object',
+        'function(= where processor) --> field + operator + escaped value',
+        where('fd1', '=', 'a'),
+        `WHERE fd1 = 'a'`,
+      ],
+      [
+        'object of simple values --> field = escaped value',
         { fd1: 1, fd2: 'a' },
         `WHERE fd1 = 1 AND fd2 = 'a'`,
       ],
@@ -211,12 +215,17 @@ describe('dml builder helper', function() {
         `WHERE fd1 IN (1, 'a')`,
       ],
       [
-        'should process function(where operator processor) in object',
+        'where processor in object -> key as field + operator + escaped value',
         { fd1: where('=', 'a') },
         `WHERE fd1 = 'a'`,
       ],
       [
-        'should process string in array',
+        'function(non where processor) in object -> key as field = non-escaped string',
+        { fd1: () => 'NOW()' },
+        `WHERE fd1 = NOW()`,
+      ],
+      [
+        `[...strings] --> joined with 'AND'`,
         ['fd1 = 1', `fd2 = 'a'`],
         `WHERE fd1 = 1 AND fd2 = 'a'`,
       ],

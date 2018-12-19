@@ -137,15 +137,12 @@ describe('dml builder', function() {
         `SELECT * FROM tb1 WHERE fd1 = 1 AND fd2 = 'a'`,
       ],
       [
-        'wheres: function(where operator processor)',
-        {
-          tb: 'tb1',
-          wheres: where('fd1', '=', 'a'),
-        },
+        'wheres: function (= where operator processor)',
+        { tb: 'tb1', wheres: where('fd1', '=', 'a') },
         `SELECT * FROM tb1 WHERE fd1 = 'a'`,
       ],
       [
-        'wheres: object with simple value, array and function',
+        'wheres: object with simple values, array, where processor and function',
         {
           tb: 'tb1',
           wheres: {
@@ -153,21 +150,23 @@ describe('dml builder', function() {
             fd2: 'a',
             fd3: [2, 3, 4],
             fd4: where('>', 5),
+            fd5: () => 'NOW()',
           },
         },
-        `SELECT * FROM tb1 WHERE fd1 = 1 AND fd2 = 'a' AND fd3 IN (2, 3, 4) AND fd4 > 5`,
+        `SELECT * FROM tb1 WHERE fd1 = 1 AND fd2 = 'a' AND fd3 IN (2, 3, 4) AND fd4 > 5 AND fd5 = NOW()`,
       ],
       [
-        'wheres: array with simple value, object and function',
+        'wheres: array of simple values, object and where processor',
         {
           tb: 'tb1',
           wheres: [
             'fd1 = 1',
             { fd2: 'a', fd3: [2, 3, 4] },
             where('fd4', '>', 5),
+            'fd5 = NOW()',
           ],
         },
-        `SELECT * FROM tb1 WHERE fd1 = 1 AND fd2 = 'a' AND fd3 IN (2, 3, 4) AND fd4 > 5`,
+        `SELECT * FROM tb1 WHERE fd1 = 1 AND fd2 = 'a' AND fd3 IN (2, 3, 4) AND fd4 > 5 AND fd5 = NOW()`,
       ],
       // WHERE - AND, OR
       [
