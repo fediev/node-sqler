@@ -267,17 +267,13 @@ describe('dml builder helper', function() {
     const testCases = [
       // [description, expression, expected result]
       [
-        'should return group by and having',
+        'groupBy + havings',
         ['fd1', 'fd2'],
         having('SUM(fd1)', '>', 10),
         'GROUP BY fd1, fd2 HAVING SUM(fd1) > 10',
       ],
-      [
-        'should return group by only on no havings',
-        ' fd1, fd2 ',
-        null,
-        'GROUP BY fd1, fd2',
-      ],
+      ['groupBy only', ['fd1', 'fd2'], null, 'GROUP BY fd1, fd2'],
+      [`no groupBy --> ''`, null, 'SUM(fd1) > 10', ''],
     ];
 
     testCases.forEach(tester);
@@ -293,10 +289,13 @@ describe('dml builder helper', function() {
 
     const testCases = [
       // [description, expression, expected result]
-      ['should return string as it is', ' fd1, fd2 ', 'GROUP BY fd1, fd2'],
-      ['should process array', ['fd1', 'fd2'], 'GROUP BY fd1, fd2'],
-      ['should return empty string on whitespace string', '    ', ''],
-      ['should return empty string on empty array', [], ''],
+      ['string --> prepend GROUP BY', ' fd1, fd2 ', 'GROUP BY fd1, fd2'],
+      ['array --> prepend GROUP BY', ['fd1', 'fd2'], 'GROUP BY fd1, fd2'],
+      [`whitespace --> ''`, '    ', ''],
+      [`[] --> ''`, [], ''],
+      [`{} --> ''`, {}, ''],
+      [`null --> ''`, null, ''],
+      [`undefined --> ''`, undefined, ''],
     ];
 
     testCases.forEach(tester);
@@ -312,51 +311,63 @@ describe('dml builder helper', function() {
 
     const testCases = [
       // [description, expression, expected result]
+      ['string --> trimmed string', ` SUM(fd1) > 10 `, `HAVING SUM(fd1) > 10`],
       [
-        'should return string as it is',
-        ` SUM(fd1) > 10 `,
-        `HAVING SUM(fd1) > 10`,
-      ],
-      [
-        'should process function',
+        'function(= having processor) --> field + operator + escaped value',
         having('SUM(fd1)', '>', 10),
         `HAVING SUM(fd1) > 10`,
       ],
       [
-        'should process simple value in object',
+        'object of simple values --> field = escaped value',
         { fd1: 1, fd2: 'a' },
         `HAVING fd1 = 1 AND fd2 = 'a'`,
       ],
       [
-        'should process array in object',
+        'array in object --> field IN (...values)',
         { fd1: [1, 'a'] },
         `HAVING fd1 IN (1, 'a')`,
       ],
       [
-        'should process function(where operator processor) in object',
-        { fd1: where('=', 'a') },
+        'having processor in object -> key as field + operator + escaped value',
+        { fd1: having('=', 'a') },
         `HAVING fd1 = 'a'`,
       ],
       [
-        'should process string in array',
+        'function(non having processor) in object -> key as field = non-escaped string',
+        { fd1: () => 'NOW()' },
+        `HAVING fd1 = NOW()`,
+      ],
+      [
+        `[...strings] --> joined with 'AND'`,
         ['SUM(fd1) > 10', `fd2 = 'a'`],
         `HAVING SUM(fd1) > 10 AND fd2 = 'a'`,
       ],
       [
-        'should process object in array',
+        `object in array --> joined with 'AND'`,
         ['SUM(fd1) > 10', { fd2: 'a', fd3: [2, 3, 4] }],
         `HAVING SUM(fd1) > 10 AND fd2 = 'a' AND fd3 IN (2, 3, 4)`,
       ],
       [
-        'should process function(where operator processor) in array',
-        ['SUM(fd1) > 10', where('fd2', '=', 'a')],
+        `function(having processor) in array --> joined with 'AND'`,
+        ['SUM(fd1) > 10', having('fd2', '=', 'a')],
         `HAVING SUM(fd1) > 10 AND fd2 = 'a'`,
       ],
-      ['should return empty string on whitespace string', '    ', ''],
-      ['should return empty string on null', null, ''],
+      [`whitespace --> ''`, '    ', ''],
+      [`funtion without string return --> ''`, () => 1, ''],
+      [`[] --> ''`, [], ''],
+      [`{} --> ''`, {}, ''],
+      [`null --> ''`, null, ''],
+      [`undefined --> ''`, undefined, ''],
     ];
 
     testCases.forEach(tester);
+
+    it('should ignore OR of the first item', function() {
+      const havings = [or('fd1 = 1'), `fd2 = 'a'`];
+      const expected = `HAVING fd1 = 1 AND fd2 = 'a'`;
+      const result = sqlHaving(havings);
+      expect(result).to.eq(expected);
+    });
   });
 
   describe('sqlOrderBy()', function() {

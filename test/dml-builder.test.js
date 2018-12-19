@@ -215,30 +215,20 @@ describe('dml builder', function() {
 
       // GROUP BY clause examples
       [
-        'string -> GROUP BY fd1, fd2',
-        {
-          tb: 'tb1',
-          groupBy: ' fd1, fd2 ',
-        },
+        'group by: string',
+        { tb: 'tb1', groupBy: 'fd1, fd2' },
         'SELECT * FROM tb1 GROUP BY fd1, fd2',
       ],
       [
-        'array ["fd1", "fd2"] -> GROUP BY fd1, fd2',
-        {
-          tb: 'tb1',
-          groupBy: ['fd1', 'fd2'],
-        },
+        'group by: array',
+        { tb: 'tb1', groupBy: ['fd1', 'fd2'] },
         'SELECT * FROM tb1 GROUP BY fd1, fd2',
       ],
 
       // HAVING clause examples : same as where
       [
         'havings: string',
-        {
-          tb: 'tb1',
-          groupBy: ['fd1', 'fd2'],
-          havings: ` COUNT(fd1) > 5 `,
-        },
+        { tb: 'tb1', groupBy: ['fd1', 'fd2'], havings: `COUNT(fd1) > 5` },
         `SELECT * FROM tb1 GROUP BY fd1, fd2 HAVING COUNT(fd1) > 5`,
       ],
       [
@@ -251,7 +241,7 @@ describe('dml builder', function() {
         `SELECT * FROM tb1 GROUP BY fd1, fd2 HAVING fd1 = 'a'`,
       ],
       [
-        'havings: object with simple value, array and function',
+        'havings: object with simple values, array, having processor and function',
         {
           tb: 'tb1',
           groupBy: ['fd1', 'fd2'],
@@ -259,29 +249,31 @@ describe('dml builder', function() {
             fd1: 1,
             fd2: 'a',
             fd3: [2, 3, 4],
-            fd4: where('>', 5),
+            fd4: having('>', 5),
+            fd5: () => 'SUM(fd6)',
           },
         },
-        `SELECT * FROM tb1 GROUP BY fd1, fd2 HAVING fd1 = 1 AND fd2 = 'a' AND fd3 IN (2, 3, 4) AND fd4 > 5`,
+        `SELECT * FROM tb1 GROUP BY fd1, fd2 HAVING fd1 = 1 AND fd2 = 'a' AND fd3 IN (2, 3, 4) AND fd4 > 5 AND fd5 = SUM(fd6)`,
       ],
       [
-        'havings: array with simple value, object and function',
+        'havings: array of simple values, object and where processor',
         {
           tb: 'tb1',
           groupBy: ['fd1', 'fd2'],
           havings: [
             'fd1 = 1',
             { fd2: 'a', fd3: [2, 3, 4] },
-            where('fd4', '>', 5),
+            having('fd4', '>', 5),
+            'fd5 = NOW()',
           ],
         },
-        `SELECT * FROM tb1 GROUP BY fd1, fd2 HAVING fd1 = 1 AND fd2 = 'a' AND fd3 IN (2, 3, 4) AND fd4 > 5`,
+        `SELECT * FROM tb1 GROUP BY fd1, fd2 HAVING fd1 = 1 AND fd2 = 'a' AND fd3 IN (2, 3, 4) AND fd4 > 5 AND fd5 = NOW()`,
       ],
       [
-        'havings: without groupBy',
+        'should ignore havings without groupBy',
         {
           tb: 'tb1',
-          havings: ` COUNT(fd1) `,
+          havings: `COUNT(fd1) > 10`,
         },
         `SELECT * FROM tb1`,
       ],
