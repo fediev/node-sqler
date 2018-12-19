@@ -149,16 +149,16 @@ describe('dml builder where processor', function() {
     };
 
     const testCases = [
-      ['should prepend OR to string', 'fd1 = 1', 'OR fd1 = 1'],
-      ['should prepend OR to function', where('fd1', '=', 'a'), `OR fd1 = 'a'`],
-      ['should prepend OR to object', { fd1: 1 }, 'OR fd1 = 1'],
+      [`string -> prepend OR`, ' fd1 = 1 ', 'OR fd1 = 1'],
+      ['function -> prepend OR', where('fd1', '=', 'a'), `OR fd1 = 'a'`],
+      ['object -> prepend OR', { fd1: 1 }, 'OR fd1 = 1'],
       [
-        'should prepend OR to two objects',
+        'object with multi properties -> join with AND and prepend OR',
         { fd1: 1, fd2: 'a' },
         `OR fd1 = 1 AND fd2 = 'a'`,
       ],
       [
-        'should prepend OR to array',
+        'array -> join with AND and prepend OR',
         ['fd1 = 1', `fd2 = 'a'`],
         `OR fd1 = 1 AND fd2 = 'a'`,
       ],
@@ -166,7 +166,7 @@ describe('dml builder where processor', function() {
 
     testCases.forEach(tester);
 
-    it('should merge multiple args with OR', function() {
+    it('multiple args -> join with OR and add (...)', function() {
       const args = [
         'fd1 = 1',
         { fd2: 'a' },
@@ -177,7 +177,7 @@ describe('dml builder where processor', function() {
       const result = or(...args);
       expect(result).to.eq(expected);
     });
-    it('should ignore or() inside or()', function() {
+    it('should ignore inside or() in or(or(A), B)', function() {
       const args = ['fd1 = 1', or('fd2 = 2'), or({ fd3: 'a' })];
       const expected = `(fd1 = 1 OR fd2 = 2 OR fd3 = 'a')`;
       const result = or(...args);
