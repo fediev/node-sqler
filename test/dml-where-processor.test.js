@@ -19,6 +19,51 @@ const {
 } = require('../lib/dml-where-processor');
 
 describe('dml builder where processor', function() {
+  describe('or()', function() {
+    const tester = function([desc, expr, expected]) {
+      it(desc, function() {
+        const result = or(expr);
+        expect(result).to.eq(expected);
+      });
+    };
+
+    const testCases = [
+      [`string -> prepend OR`, ' fd1 = 1 ', 'OR fd1 = 1'],
+      ['function -> prepend OR', where('fd1', '=', 'a'), `OR fd1 = 'a'`],
+      ['object -> prepend OR', { fd1: 1 }, 'OR fd1 = 1'],
+      [
+        'object with multi properties -> join with AND and prepend OR',
+        { fd1: 1, fd2: 'a' },
+        `OR fd1 = 1 AND fd2 = 'a'`,
+      ],
+      [
+        'array -> join with AND and prepend OR',
+        ['fd1 = 1', `fd2 = 'a'`],
+        `OR fd1 = 1 AND fd2 = 'a'`,
+      ],
+    ];
+
+    testCases.forEach(tester);
+
+    it('multiple args -> join with OR and add (...)', function() {
+      const args = [
+        'fd1 = 1',
+        { fd2: 'a' },
+        ['fd3 = 2', 'fd4 > 3'],
+        where('fd5', '<', 4),
+      ];
+      const expected = `(fd1 = 1 OR fd2 = 'a' OR fd3 = 2 AND fd4 > 3 OR fd5 < 4)`;
+      const result = or(...args);
+      expect(result).to.eq(expected);
+    });
+    it('should ignore inside or() in or(or(A), B)', function() {
+      const args = ['fd1 = 1', or('fd2 = 2'), or({ fd3: 'a' })];
+      const expected = `(fd1 = 1 OR fd2 = 2 OR fd3 = 'a')`;
+      const result = or(...args);
+      expect(result).to.eq(expected);
+    });
+  });
+
   describe('where operator processors ', function() {
     const tester = function([desc, expr, expected]) {
       it(desc, function() {
@@ -139,50 +184,5 @@ describe('dml builder where processor', function() {
     ];
 
     testCases.forEach(tester);
-  });
-
-  describe('or()', function() {
-    const tester = function([desc, expr, expected]) {
-      it(desc, function() {
-        const result = or(expr);
-        expect(result).to.eq(expected);
-      });
-    };
-
-    const testCases = [
-      [`string -> prepend OR`, ' fd1 = 1 ', 'OR fd1 = 1'],
-      ['function -> prepend OR', where('fd1', '=', 'a'), `OR fd1 = 'a'`],
-      ['object -> prepend OR', { fd1: 1 }, 'OR fd1 = 1'],
-      [
-        'object with multi properties -> join with AND and prepend OR',
-        { fd1: 1, fd2: 'a' },
-        `OR fd1 = 1 AND fd2 = 'a'`,
-      ],
-      [
-        'array -> join with AND and prepend OR',
-        ['fd1 = 1', `fd2 = 'a'`],
-        `OR fd1 = 1 AND fd2 = 'a'`,
-      ],
-    ];
-
-    testCases.forEach(tester);
-
-    it('multiple args -> join with OR and add (...)', function() {
-      const args = [
-        'fd1 = 1',
-        { fd2: 'a' },
-        ['fd3 = 2', 'fd4 > 3'],
-        where('fd5', '<', 4),
-      ];
-      const expected = `(fd1 = 1 OR fd2 = 'a' OR fd3 = 2 AND fd4 > 3 OR fd5 < 4)`;
-      const result = or(...args);
-      expect(result).to.eq(expected);
-    });
-    it('should ignore inside or() in or(or(A), B)', function() {
-      const args = ['fd1 = 1', or('fd2 = 2'), or({ fd3: 'a' })];
-      const expected = `(fd1 = 1 OR fd2 = 2 OR fd3 = 'a')`;
-      const result = or(...args);
-      expect(result).to.eq(expected);
-    });
   });
 });
