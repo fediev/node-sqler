@@ -16,9 +16,9 @@ const {
   whereExists,
   whereNotExists,
   or,
-} = require('../lib/dml-where-processor');
+} = require('../lib/dml-where-helper');
 
-describe('dml builder where processor', function() {
+describe('dml builder where helper', function() {
   describe('or()', function() {
     const tester = function([desc, expr, expected]) {
       it(desc, function() {
@@ -64,7 +64,7 @@ describe('dml builder where processor', function() {
     });
   });
 
-  describe('where operator processors ', function() {
+  describe('where operator processors', function() {
     const tester = function([desc, expr, expected]) {
       it(desc, function() {
         if (typeof expr === 'function') {

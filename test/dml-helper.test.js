@@ -15,7 +15,7 @@ const {
   sqlInsertInfos,
   sqlUpdateInfos,
 } = require('../lib/dml-helper');
-const { where, having, or } = require('../lib/dml-where-processor');
+const { where, having, or } = require('../lib/dml-where-helper');
 
 describe('dml builder helper', function() {
   describe('sqlTable()', function() {

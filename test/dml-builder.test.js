@@ -24,7 +24,7 @@ const {
   whereNotExists,
   or,
   having,
-} = require('../lib/dml-where-processor');
+} = require('../lib/dml-where-helper');
 
 describe('dml builder', function() {
   describe('select()', function() {
