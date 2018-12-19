@@ -398,36 +398,6 @@ describe('dml builder', function() {
     };
 
     const testCases = [
-      //
-    ];
-
-    testCases.forEach(tester);
-  });
-
-  describe('update()', function() {
-    const tester = function([desc, queryOpts, expected]) {
-      it(desc, function() {
-        const result = update(queryOpts);
-        expect(result).to.eq(expected);
-      });
-    };
-
-    const testCases = [
-      //
-    ];
-
-    testCases.forEach(tester);
-  });
-
-  describe('insert()', function() {
-    const tester = function([desc, queryOpts, expected]) {
-      it(desc, function() {
-        const result = insert(queryOpts);
-        expect(result).to.eq(expected);
-      });
-    };
-
-    const testCases = [
       [
         'should return insert sql',
         {
