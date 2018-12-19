@@ -74,6 +74,12 @@ describe('dml builder where processor', function() {
         { fd1: whereIn([1, 'a']) },
         `fd1 IN (1, 'a')`,
       ],
+      ['whereIn(non_array) with field', whereIn('fd1', 1), `fd1 IN (1)`],
+      [
+        'whereIn(non_array) in object context',
+        { fd1: whereIn(1) },
+        `fd1 IN (1)`,
+      ],
       [
         'whereNotIn() with field',
         whereNotIn('fd1', [1, 'a']),
@@ -83,11 +89,6 @@ describe('dml builder where processor', function() {
         'whereNotIn() in object context',
         { fd1: whereNotIn([1, 'a']) },
         `fd1 NOT IN (1, 'a')`,
-      ],
-      [
-        'whereNotIn(not_array_value) in object context',
-        { fd1: whereNotIn(1) },
-        `fd1 NOT IN (1)`,
       ],
       // whereNull(), whereNotNull()
       ['whereNull() with field', whereNull('fd1'), `fd1 IS NULL`],
