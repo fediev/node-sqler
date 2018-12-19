@@ -294,52 +294,30 @@ describe('dml builder', function() {
 
       // LIMIT clause examples
       [
-        'string -> LIMIT 1, 2',
-        {
-          tb: 'tb1',
-          limit: '  1, 2   ',
-        },
+        'limit: string',
+        { tb: 'tb1', limit: '1, 2' },
         'SELECT * FROM tb1 LIMIT 1, 2',
       ],
+      ['limit: number', { tb: 'tb1', limit: 1 }, 'SELECT * FROM tb1 LIMIT 1'],
       [
-        'number -> LIMIT 1',
-        {
-          tb: 'tb1',
-          limit: 1,
-        },
-        'SELECT * FROM tb1 LIMIT 1',
-      ],
-      [
-        'array [1] -> LIMIT 1',
-        {
-          tb: 'tb1',
-          limit: [1],
-        },
+        'limit: array [count]',
+        { tb: 'tb1', limit: [1] },
         'SELECT * FROM tb1 LIMIT 1',
       ],
 
       [
-        'array [1, 2] -> LIMIT 1, 2',
-        {
-          tb: 'tb1',
-          limit: [1, 2],
-        },
+        'limit: array [offset, count]',
+        { tb: 'tb1', limit: [1, 2] },
         'SELECT * FROM tb1 LIMIT 1, 2',
       ],
       [
-        'object { count: 1 } -> LIMIT 1',
-        {
-          tb: 'tb1',
-          limit: { count: 1 },
-        },
+        'limit: object { count: n }',
+        { tb: 'tb1', limit: { count: 1 } },
         'SELECT * FROM tb1 LIMIT 1',
       ],
       [
-        'object { count: 1, offset: 2 } -> LIMIT 1, 2',
-        {
-          tb: 'tb1',
-          limit: { count: 1, offset: 2 },
-        },
+        'limit: object { count: n1, offset: n2 }',
+        { tb: 'tb1', limit: { count: 1, offset: 2 } },
         'SELECT * FROM tb1 LIMIT 1 OFFSET 2',
       ],
     ];

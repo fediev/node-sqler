@@ -423,21 +423,23 @@ describe('dml builder helper', function() {
 
     const testCases = [
       // [description, expression, expected result]
-      ['should return string as it is', ' 1 ', 'LIMIT 1'],
-      ['should return row count on number', 1, 'LIMIT 1'],
-      ['should return row count on array', [1], 'LIMIT 1'],
-      ['should return offset and row count on array', [1, 2], 'LIMIT 1, 2'],
-      ['should return row count on object', { count: 1 }, 'LIMIT 1'],
+      ['string --> trim and prepend LIMIT', ' 1 ', 'LIMIT 1'],
+      ['number --> prepend LIMIT', 1, 'LIMIT 1'],
+      ['[count] --> LIMIT count', [1], 'LIMIT 1'],
+      ['[offset, count] --> LIMIT offset, count', [1, 2], 'LIMIT 1, 2'],
+      ['{ count: n } --> LIMIT count', { count: 1 }, 'LIMIT 1'],
       [
-        'should return row count and offset on object',
+        '{ count: n1, offset: n2 } --> LIMIT count OFFSET offset',
         { count: 1, offset: 2 },
         'LIMIT 1 OFFSET 2',
       ],
-      ['should return empty string on whitespace string', '    ', ''],
-      ['should return empty string on negative number', -1, ''],
-      ['should return empty string on empty array', [], ''],
-      ['should return empty string on invalid object', { offset: 2 }, ''],
-      ['should return empty string on null', null, ''],
+      [`negative num --> ''`, -1, ''],
+      [`invalid object --> ''`, { offset: 2 }, ''],
+      [`whitespace --> ''`, '    ', ''],
+      [`[] --> ''`, [], ''],
+      [`{} --> ''`, {}, ''],
+      [`null --> ''`, null, ''],
+      [`undefined --> ''`, undefined, ''],
     ];
 
     testCases.forEach(tester);
