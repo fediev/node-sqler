@@ -91,6 +91,7 @@ describe('dml builder helper', function() {
         ],
         'LEFT JOIN tb2 AS b ON a.fd11 = b.fd21 RIGHT JOIN tb3 AS c ON b.fd21 = c.fd31',
       ],
+      [`whitespace --> ''`, 'tb1', '    ', ''],
       [`[] --> ''`, 'tb1', [], ''],
       [`[...invalid join values] --> ''`, 'tb1', [{}, 1, 'join'], ''],
       [`{} --> ''`, 'tb1', {}, ''],
@@ -235,7 +236,7 @@ describe('dml builder helper', function() {
         `WHERE fd1 = 1 AND fd2 = 'a' AND fd3 IN (2, 3, 4)`,
       ],
       [
-        `function(where operator processor) in array --> joined with 'AND'`,
+        `function(where processor) in array --> joined with 'AND'`,
         ['fd1 = 1', where('fd2', '=', 'a')],
         `WHERE fd1 = 1 AND fd2 = 'a'`,
       ],
@@ -244,6 +245,7 @@ describe('dml builder helper', function() {
       [`[] --> ''`, [], ''],
       [`{} --> ''`, {}, ''],
       [`null --> ''`, null, ''],
+      [`undefined --> ''`, undefined, ''],
     ];
 
     testCases.forEach(tester);

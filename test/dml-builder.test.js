@@ -118,7 +118,7 @@ describe('dml builder', function() {
 
       // join + field
       [
-        'JOIN + fields',
+        'fields for join',
         {
           tb: { tb1: 'a' },
           joins: [{ type: 'left', tb: { tb2: 'b' }, on: ['fd11', 'fd21'] }],
@@ -271,10 +271,7 @@ describe('dml builder', function() {
       ],
       [
         'should ignore havings without groupBy',
-        {
-          tb: 'tb1',
-          havings: `COUNT(fd1) > 10`,
-        },
+        { tb: 'tb1', havings: `COUNT(fd1) > 10` },
         `SELECT * FROM tb1`,
       ],
 
