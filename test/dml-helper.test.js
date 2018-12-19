@@ -112,6 +112,7 @@ describe('dml builder helper', function() {
       [`true --> 'DISTINCT'`, true, 'DISTINCT'],
       [`false --> ''`, false, ''],
       [`others --> ''`, 1, ''],
+      [`undefined --> ''`, undefined, ''],
     ];
 
     testCases.forEach(tester);

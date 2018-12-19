@@ -80,8 +80,6 @@ describe('dml builder', function() {
         { tb: 'tb1', distinct: true },
         'SELECT DISTINCT * FROM tb1',
       ],
-      ['distinct: false', { tb: 'tb1', distinct: false }, 'SELECT * FROM tb1'],
-      ['distinct: others', { tb: 'tb1', distinct: 1 }, 'SELECT * FROM tb1'],
 
       // SELECT `TOP` examples
       [
