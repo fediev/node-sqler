@@ -15,7 +15,7 @@ const {
   sqlInsertInfos,
   sqlUpdateInfos,
 } = require('../lib/dml-helper');
-const { where, having } = require('../lib/dml-where-processor');
+const { where, having, or } = require('../lib/dml-where-processor');
 
 describe('dml builder helper', function() {
   describe('sqlTable()', function() {
@@ -247,6 +247,13 @@ describe('dml builder helper', function() {
     ];
 
     testCases.forEach(tester);
+
+    it('should ignore OR of the first item', function() {
+      const wheres = [or('fd1 = 1'), `fd2 = 'a'`];
+      const expected = `WHERE fd1 = 1 AND fd2 = 'a'`;
+      const result = sqlWhere(wheres);
+      expect(result).to.eq(expected);
+    });
   });
 
   describe('sqlGroupByHaving()', function() {
