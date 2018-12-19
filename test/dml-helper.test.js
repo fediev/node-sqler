@@ -127,12 +127,13 @@ describe('dml builder helper', function() {
     };
 
     const testCases = [
-      ['should return TOP cluase on number', 1, 'TOP 1'],
-      ['should return a floored integer on non-integer number', 1.9, 'TOP 1'],
-      ['should return TOP cluase on string of number', '1', 'TOP 1'],
-      ['should return empty string on non-positive number', 0, ''],
-      ['should return empty string on non-numeric string', 'a', ''],
-      ['should return empty string on array of numbers', [1, 2, 3], ''],
+      [`positive int --> int`, 1, 'TOP 1'],
+      ['positive float --> floored number', 1.9, 'TOP 1'],
+      ['string of positive number --> parsed number', '1', 'TOP 1'],
+      [`non-positive number --> ''`, 0, ''],
+      [`non-numeric string --> ''`, 'a', ''],
+      [`array of numbers --> ''`, [1, 2, 3], ''],
+      [`undefined --> ''`, undefined, ''],
     ];
 
     testCases.forEach(tester);

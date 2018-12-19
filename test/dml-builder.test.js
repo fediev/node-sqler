@@ -83,19 +83,13 @@ describe('dml builder', function() {
 
       // SELECT `TOP` examples
       [
-        'top: number',
-        {
-          tb: 'tb1',
-          top: 1,
-        },
+        'top: positive number',
+        { tb: 'tb1', top: 1 },
         'SELECT TOP 1 * FROM tb1',
       ],
       [
         'top: string of positive number',
-        {
-          tb: 'tb1',
-          top: '1',
-        },
+        { tb: 'tb1', top: '1' },
         'SELECT TOP 1 * FROM tb1',
       ],
 
