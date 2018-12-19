@@ -382,10 +382,14 @@ describe('dml builder helper', function() {
 
     const testCases = [
       // [description, expression, expected result]
-      ['should return string as it is', ' fd1, fd2 ', 'ORDER BY fd1, fd2'],
-      ['should process array', ['fd1', 'fd2'], 'ORDER BY fd1, fd2'],
       [
-        'should process object',
+        'string --> trim and prepend ORDER BY',
+        ' fd1, fd2 ',
+        'ORDER BY fd1, fd2',
+      ],
+      ['arry --> prepend ORDER BY', ['fd1', 'fd2'], 'ORDER BY fd1, fd2'],
+      [
+        'object -> prepend ORDER BY with direction',
         { fd1: 'DESC', fd2: 'ASC' },
         'ORDER BY fd1 DESC, fd2 ASC',
       ],
@@ -394,13 +398,16 @@ describe('dml builder helper', function() {
         { fd1: 'desc', fd2: 'asc' },
         'ORDER BY fd1 DESC, fd2 ASC',
       ],
-      ['should return empty string on whitespace string', '    ', ''],
-      ['should return empty string on null', null, ''],
       [
         'should process invalid direction value as ASC',
         { fd1: '_INVALID_DIR_' },
         'ORDER BY fd1 ASC',
       ],
+      [`whitespace --> ''`, '    ', ''],
+      [`[] --> ''`, [], ''],
+      [`{} --> ''`, {}, ''],
+      [`null --> ''`, null, ''],
+      [`undefined --> ''`, undefined, ''],
     ];
 
     testCases.forEach(tester);

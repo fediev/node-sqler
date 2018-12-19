@@ -277,27 +277,18 @@ describe('dml builder', function() {
 
       // ORDER BY clause examples
       [
-        'string -> ORDER BY fd1, fd2',
-        {
-          tb: 'tb1',
-          orderBy: ' fd1, fd2 ',
-        },
+        'order by: string',
+        { tb: 'tb1', orderBy: 'fd1, fd2' },
         'SELECT * FROM tb1 ORDER BY fd1, fd2',
       ],
       [
-        `array ['fd1', 'fd2'] -> ORDER BY fd1, fd2`,
-        {
-          tb: 'tb1',
-          orderBy: ['fd1', 'fd2'],
-        },
+        `order by: array`,
+        { tb: 'tb1', orderBy: ['fd1', 'fd2'] },
         'SELECT * FROM tb1 ORDER BY fd1, fd2',
       ],
       [
-        `object { fd1: 'DESC', fd2: 'ASC' } -> ORDER BY fd1 DESC, fd2 ASC`,
-        {
-          tb: 'tb1',
-          orderBy: { fd1: 'DESC', fd2: 'ASC' },
-        },
+        `order by: object`,
+        { tb: 'tb1', orderBy: { fd1: 'DESC', fd2: 'ASC' } },
         'SELECT * FROM tb1 ORDER BY fd1 DESC, fd2 ASC',
       ],
 
