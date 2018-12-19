@@ -352,17 +352,12 @@ describe('dml builder', function() {
     const testCases = [
       [
         'should return union sql of selects',
-        {
-          selects: [{ tb: 'tb1' }, { tb: 'tb2' }],
-        },
+        { selects: [{ tb: 'tb1' }, { tb: 'tb2' }] },
         `SELECT * FROM tb1 UNION SELECT * FROM tb2`,
       ],
       [
         'should return union sql of selects and orderBy',
-        {
-          selects: [{ tb: 'tb1' }, { tb: 'tb2' }],
-          orderBy: 'fd1',
-        },
+        { selects: [{ tb: 'tb1' }, { tb: 'tb2' }], orderBy: 'fd1' },
         `SELECT * FROM tb1 UNION SELECT * FROM tb2 ORDER BY fd1`,
       ],
     ];
@@ -381,17 +376,12 @@ describe('dml builder', function() {
     const testCases = [
       [
         'should return union all sql of selects',
-        {
-          selects: [{ tb: 'tb1' }, { tb: 'tb2' }],
-        },
+        { selects: [{ tb: 'tb1' }, { tb: 'tb2' }] },
         `SELECT * FROM tb1 UNION ALL SELECT * FROM tb2`,
       ],
       [
         'should return union all sql of selects and orderBy',
-        {
-          selects: [{ tb: 'tb1' }, { tb: 'tb2' }],
-          orderBy: 'fd1',
-        },
+        { selects: [{ tb: 'tb1' }, { tb: 'tb2' }], orderBy: 'fd1' },
         `SELECT * FROM tb1 UNION ALL SELECT * FROM tb2 ORDER BY fd1`,
       ],
     ];
