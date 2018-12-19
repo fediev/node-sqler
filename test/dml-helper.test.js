@@ -3,6 +3,7 @@ const { expect } = require('chai');
 const {
   sqlTable,
   sqlJoin,
+  sqlDistinct,
   sqlTop,
   sqlSelectFields,
   sqlWhere,
@@ -97,6 +98,23 @@ describe('dml builder helper', function() {
       ['should return empty string on emtpy object', { tb1: 'a' }, {}, ''],
       ['should return empty string on null', { tb1: 'a' }, null, ''],
     ];
+    testCases.forEach(tester);
+  });
+
+  describe('sqlDistinct()', function() {
+    const tester = function([desc, expr, expected]) {
+      it(desc, function() {
+        const result = sqlDistinct(expr);
+        expect(result).to.eq(expected);
+      });
+    };
+
+    const testCases = [
+      [`true --> 'DISTINCT'`, true, 'DISTINCT'],
+      [`false --> ''`, false, ''],
+      [`others --> ''`, 1, ''],
+    ];
+
     testCases.forEach(tester);
   });
 

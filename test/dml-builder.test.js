@@ -98,6 +98,15 @@ describe('dml builder', function() {
         `SELECT * FROM tb1 AS a LEFT JOIN tb2 AS b ON a.fd11 = b.fd21 RIGHT JOIN tb3 AS c ON b.fd21 = c.fd31`,
       ],
 
+      // SELECT `DISTINCT` examples
+      [
+        'distinct: true',
+        { tb: 'tb1', distinct: true },
+        'SELECT DISTINCT * FROM tb1',
+      ],
+      ['distinct: false', { tb: 'tb1', distinct: false }, 'SELECT * FROM tb1'],
+      ['distinct: others', { tb: 'tb1', distinct: 1 }, 'SELECT * FROM tb1'],
+
       // SELECT `TOP` examples
       [
         'top: number',
