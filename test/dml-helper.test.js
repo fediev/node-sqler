@@ -149,36 +149,36 @@ describe('dml builder helper', function() {
 
     const testCases = [
       // [description, expression, expected result]
-      [`should return '*' on whitespace string`, `   `, `*`],
-      [`should return '*' when fields is not supplied`, undefined, `*`],
+      [`whitespace --> '*'`, `   `, `*`],
+      [`undefined --> '*'`, undefined, `*`],
       [
-        `should return trimmed string on string`,
-        ` fd1, fd2 AS x `,
-        `fd1, fd2 AS x`,
+        `string --> trimmed string`,
+        ` fd1, fd2 AS x, 'str_const', NOW() `,
+        `fd1, fd2 AS x, 'str_const', NOW()`,
       ],
       [
-        `should parse alias on object`,
+        `{ fd1: 'a' } --> 'fd1 AS a'`,
         { fd1: 'a', fd2: 'b' },
         `fd1 AS a, fd2 AS b`,
       ],
       [
-        `should return merged on array`,
-        [' fd1 ', 'fd2 AS x', 'COUNT(fd3)'],
-        `fd1, fd2 AS x, COUNT(fd3)`,
+        `[...strings] --> joined`,
+        ['fd1', 'fd2 AS x', `'str_const'`, 'NOW()'],
+        `fd1, fd2 AS x, 'str_const', NOW()`,
       ],
       [
-        `should return merged on array of string and object`,
+        `[...strings and objects] --> joined`,
         [' fd1 ', { fd2: 'b', fd3: 'c' }],
         `fd1, fd2 AS b, fd3 AS c`,
       ],
       [
-        `should append table alias to field`,
+        `{ tableAlias: [...fields] } --> tableAlias.field ...`,
         { a: ['fd11', 'fd12'], b: ['fd21', 'fd22'] },
         `a.fd11, a.fd12, b.fd21, b.fd22`,
       ],
-      [`should return '*' on empty array`, [], `*`],
-      [`should return '*' on empty object`, {}, `*`],
-      [`should return '*' on null`, null, `*`],
+      [`[] --> '*'`, [], `*`],
+      [`{} --> '*'`, {}, `*`],
+      [`null --> '*'`, null, `*`],
     ];
 
     testCases.forEach(tester);

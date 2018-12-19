@@ -94,43 +94,25 @@ describe('dml builder', function() {
       ],
 
       // select fields examples
+      [`fields: (not supplied) --> '*'`, { tb: 'tb1' }, `SELECT * FROM tb1`],
       [
-        'fields: (not supplied)',
-        {
-          tb: 'tb1',
-        },
-        `SELECT * FROM tb1`,
+        'fields: string --> trimmed string',
+        { tb: 'tb1', fields: `fd1, fd2 AS x, 'str_const', NOW()` },
+        `SELECT fd1, fd2 AS x, 'str_const', NOW() FROM tb1`,
       ],
       [
-        'fields: string',
-        {
-          tb: 'tb1',
-          fields: `  fd1, fd2 AS x  `,
-        },
-        `SELECT fd1, fd2 AS x FROM tb1`,
-      ],
-      [
-        'fields: object',
-        {
-          tb: 'tb1',
-          fields: { fd1: 'a', fd2: 'b' },
-        },
+        'fields: object --> field with alias',
+        { tb: 'tb1', fields: { fd1: 'a', fd2: 'b' } },
         `SELECT fd1 AS a, fd2 AS b FROM tb1`,
       ],
       [
         'fields: array of string',
-        {
-          tb: 'tb1',
-          fields: [' fd1 ', 'fd2 AS x', 'COUNT(fd3)'],
-        },
-        `SELECT fd1, fd2 AS x, COUNT(fd3) FROM tb1`,
+        { tb: 'tb1', fields: ['fd1', 'fd2 AS x', `'str_const'`, 'NOW()'] },
+        `SELECT fd1, fd2 AS x, 'str_const', NOW() FROM tb1`,
       ],
       [
         'fields: array of string and object',
-        {
-          tb: 'tb1',
-          fields: [' fd1 ', { fd2: 'b', fd3: 'c' }],
-        },
+        { tb: 'tb1', fields: [' fd1 ', { fd2: 'b', fd3: 'c' }] },
         `SELECT fd1, fd2 AS b, fd3 AS c FROM tb1`,
       ],
 
@@ -139,13 +121,7 @@ describe('dml builder', function() {
         'JOIN + fields',
         {
           tb: { tb1: 'a' },
-          joins: [
-            {
-              type: 'left',
-              tb: { tb2: 'b' },
-              on: ['fd11', 'fd21'],
-            },
-          ],
+          joins: [{ type: 'left', tb: { tb2: 'b' }, on: ['fd11', 'fd21'] }],
           fields: { a: ['fd11', 'fd12'], b: ['fd21', 'fd22'] },
         },
         `SELECT a.fd11, a.fd12, b.fd21, b.fd22 FROM tb1 AS a LEFT JOIN tb2 AS b ON a.fd11 = b.fd21`,
