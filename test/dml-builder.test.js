@@ -130,10 +130,7 @@ describe('dml builder', function() {
       // WHERE clause examples
       [
         'wheres: string',
-        {
-          tb: 'tb1',
-          wheres: ` fd1 = 1 AND fd2 = 'a' `,
-        },
+        { tb: 'tb1', wheres: `fd1 = 1 AND fd2 = 'a'` },
         `SELECT * FROM tb1 WHERE fd1 = 1 AND fd2 = 'a'`,
       ],
       [

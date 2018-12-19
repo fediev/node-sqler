@@ -195,7 +195,7 @@ describe('dml builder helper', function() {
     const testCases = [
       // [description, expression, expected result]
       [
-        'should return string as it is',
+        'string --> trimmed string',
         ` fd1 = 1 AND fd2 = 'a' `,
         `WHERE fd1 = 1 AND fd2 = 'a'`,
       ],
@@ -210,7 +210,7 @@ describe('dml builder helper', function() {
         `WHERE fd1 = 1 AND fd2 = 'a'`,
       ],
       [
-        'should process array in object',
+        'array in object --> field IN (...values)',
         { fd1: [1, 'a'] },
         `WHERE fd1 IN (1, 'a')`,
       ],
@@ -230,17 +230,20 @@ describe('dml builder helper', function() {
         `WHERE fd1 = 1 AND fd2 = 'a'`,
       ],
       [
-        'should process object in array',
+        `object in array --> joined with 'AND'`,
         ['fd1 = 1', { fd2: 'a', fd3: [2, 3, 4] }],
         `WHERE fd1 = 1 AND fd2 = 'a' AND fd3 IN (2, 3, 4)`,
       ],
       [
-        'should process function(where operator processor) in array',
+        `function(where operator processor) in array --> joined with 'AND'`,
         ['fd1 = 1', where('fd2', '=', 'a')],
         `WHERE fd1 = 1 AND fd2 = 'a'`,
       ],
-      ['should return empty string on whitespace string', '    ', ''],
-      ['should return empty string on null', null, ''],
+      [`whitespace --> ''`, '    ', ''],
+      [`funtion without string return --> ''`, () => 1, ''],
+      [`[] --> ''`, [], ''],
+      [`{} --> ''`, {}, ''],
+      [`null --> ''`, null, ''],
     ];
 
     testCases.forEach(tester);
