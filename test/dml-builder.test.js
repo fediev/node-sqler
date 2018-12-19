@@ -38,18 +38,10 @@ describe('dml builder', function() {
     const testCases = [
       // [description, expression, expected result]
       // select table expression examples
-      [
-        'table: string',
-        {
-          tb: 'tb1',
-        },
-        `SELECT * FROM tb1`,
-      ],
+      ['table: string', { tb: 'tb1' }, `SELECT * FROM tb1`],
       [
         'table: object for alias',
-        {
-          tb: { tb1: 'a' },
-        },
+        { tb: { tb1: 'a' } },
         `SELECT * FROM tb1 AS a`,
       ],
 
