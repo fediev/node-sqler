@@ -57,33 +57,33 @@ describe('dml builder helper', function() {
     };
 
     const testCases = [
-      // [description, expression, expected result]
+      // [description, tb, join, expected result]
       [
-        'should join without table aliases',
+        'join without table aliases',
         'tb1',
         { type: 'inner', tb: 'tb2', on: ['fd11', 'fd21'] },
         'INNER JOIN tb2 ON tb1.fd11 = tb2.fd21',
       ],
       [
-        'should join with the first table alias',
+        'join with the first table alias',
         { tb1: 'a' },
         { type: 'left', tb: 'tb2', on: ['fd11', 'fd21'] },
         'LEFT JOIN tb2 ON a.fd11 = tb2.fd21',
       ],
       [
-        'should join with the second table alias',
+        'join with the second table alias',
         'tb1',
-        { type: 'left', tb: { tb2: 'b' }, on: ['fd11', 'fd21'] },
-        'LEFT JOIN tb2 AS b ON tb1.fd11 = b.fd21',
+        { type: 'right', tb: { tb2: 'b' }, on: ['fd11', 'fd21'] },
+        'RIGHT JOIN tb2 AS b ON tb1.fd11 = b.fd21',
       ],
       [
-        'should join with table aliases',
+        'join with table aliases',
         { tb1: 'a' },
-        { type: 'left', tb: { tb2: 'b' }, on: ['fd11', 'fd21'] },
-        'LEFT JOIN tb2 AS b ON a.fd11 = b.fd21',
+        { type: 'cross', tb: { tb2: 'b' }, on: ['fd11', 'fd21'] },
+        'CROSS JOIN tb2 AS b ON a.fd11 = b.fd21',
       ],
       [
-        'should join multiple joins',
+        'multiple joins',
         { tb1: 'a' },
         [
           { type: 'left', tb: { tb2: 'b' }, on: ['fd11', 'fd21'] },
@@ -91,15 +91,11 @@ describe('dml builder helper', function() {
         ],
         'LEFT JOIN tb2 AS b ON a.fd11 = b.fd21 RIGHT JOIN tb3 AS c ON b.fd21 = c.fd31',
       ],
-      ['should return empty string on empty join array', { tb1: 'a' }, [], ''],
-      [
-        'should return empty string on array of invalid values',
-        { tb1: 'a' },
-        [{}, 1, 'join'],
-        '',
-      ],
-      ['should return empty string on emtpy object', { tb1: 'a' }, {}, ''],
-      ['should return empty string on null', { tb1: 'a' }, null, ''],
+      [`[] --> ''`, 'tb1', [], ''],
+      [`[...invalid join values] --> ''`, 'tb1', [{}, 1, 'join'], ''],
+      [`{} --> ''`, 'tb1', {}, ''],
+      [`null --> ''`, 'tb1', null, ''],
+      [`undefined --> ''`, 'tb1', undefined, ''],
     ];
     testCases.forEach(tester);
   });
