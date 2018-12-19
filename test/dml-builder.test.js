@@ -331,11 +331,13 @@ describe('dml builder', function() {
   });
 
   describe('subquery()', function() {
-    it('should return function of select() result', function() {
+    it('should return function that returns select() result', function() {
       const queryOpts = { tb: 'tb1' };
-      const result = subquery(queryOpts)();
+      const result = subquery(queryOpts);
+      expect(result).to.be.an('function');
+      const returned = result();
       const expected = '(SELECT * FROM tb1)';
-      expect(result).to.eql(expected);
+      expect(returned).to.eql(expected);
     });
   });
 
