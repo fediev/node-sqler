@@ -449,39 +449,27 @@ describe('dml builder', function() {
 
     const testCases = [
       [
-        'should return update sql from object',
-        {
-          tb: 'tb1',
-          infos: { fd1: 1, fd2: 'a', fd3: () => 'NOW()' },
-        },
+        'object update infos',
+        { tb: 'tb1', infos: { fd1: 1, fd2: 'a', fd3: () => 'NOW()' } },
         `UPDATE tb1 SET fd1 = 1, fd2 = 'a', fd3 = NOW()`,
       ],
       [
-        'should return update sql from string',
-        {
-          tb: 'tb1',
-          infos: `fd1 = 1, fd2 = 'a', fd3 = NOW()`,
-        },
+        'string update infos',
+        { tb: 'tb1', infos: `fd1 = 1, fd2 = 'a', fd3 = NOW()` },
         `UPDATE tb1 SET fd1 = 1, fd2 = 'a', fd3 = NOW()`,
       ],
       [
-        'should return update sql from array of string',
-        {
-          tb: 'tb1',
-          infos: ['fd1 = 1', `fd2 = 'a'`, 'fd3 = NOW()'],
-        },
+        'array of string update infos',
+        { tb: 'tb1', infos: ['fd1 = 1', `fd2 = 'a'`, 'fd3 = NOW()'] },
         `UPDATE tb1 SET fd1 = 1, fd2 = 'a', fd3 = NOW()`,
       ],
       [
-        'should return update sql from array of string and object',
-        {
-          tb: 'tb1',
-          infos: ['fd1 = 1', { fd2: 'a', fd3: () => 'NOW()' }],
-        },
+        'array of string and object string infos',
+        { tb: 'tb1', infos: ['fd1 = 1', { fd2: 'a', fd3: () => 'NOW()' }] },
         `UPDATE tb1 SET fd1 = 1, fd2 = 'a', fd3 = NOW()`,
       ],
       [
-        'should return update sql with where, order by and limit',
+        'with where, order by and limit',
         {
           tb: 'tb1',
           infos: { fd1: 1, fd2: 'a', fd3: () => 'NOW()' },

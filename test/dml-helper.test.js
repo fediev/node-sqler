@@ -517,36 +517,30 @@ describe('dml builder helper', function() {
     const testCases = [
       // [description, expression, expected result]
       [
-        'should return string as it is',
-        `  fd1 = 1, fd2 = 'a', fd3 = NOW()  `,
+        'string --> trimmed string',
+        `fd1 = 1, fd2 = 'a', fd3 = NOW()  `,
         `fd1 = 1, fd2 = 'a', fd3 = NOW()`,
       ],
       [
-        'should return string as it is',
-        {
-          fd1: 1,
-          fd2: 'a',
-          fd3: () => 'NOW()',
-        },
+        'object',
+        { fd1: 1, fd2: 'a', fd3: () => 'NOW()' },
         `fd1 = 1, fd2 = 'a', fd3 = NOW()`,
       ],
       [
-        'should return string as it is',
+        'array of string',
         ['fd1 = 1', `fd2 = 'a'`, 'fd3 = NOW()'],
         `fd1 = 1, fd2 = 'a', fd3 = NOW()`,
       ],
       [
-        'should return string as it is',
-        [
-          'fd1 = 1',
-          {
-            fd2: 'a',
-            fd3: () => 'NOW()',
-          },
-        ],
+        'array of string and object',
+        ['fd1 = 1', { fd2: 'a', fd3: () => 'NOW()' }],
         `fd1 = 1, fd2 = 'a', fd3 = NOW()`,
       ],
+      [`whitespace --> ''`, '    ', ''],
+      [`[] --> ''`, [], ''],
+      [`{} --> ''`, {}, ''],
       [`null --> ''`, null, ''],
+      [`undefined --> ''`, undefined, ''],
     ];
 
     testCases.forEach(tester);
