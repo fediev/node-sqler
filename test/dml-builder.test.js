@@ -494,21 +494,13 @@ describe('dml builder', function() {
 
     const testCases = [
       [
-        'should return delete sql',
-        {
-          tb: 'tb1',
-          wheres: { fd1: 1 },
-        },
+        'with wheres',
+        { tb: 'tb1', wheres: { fd1: 1 } },
         `DELETE FROM tb1 WHERE fd1 = 1`,
       ],
       [
-        'should return delete sql with orderBy and limit',
-        {
-          tb: 'tb1',
-          wheres: { fd1: 1 },
-          orderBy: 'fd1',
-          limit: 5,
-        },
+        'with wheres, orderBy and limit',
+        { tb: 'tb1', wheres: { fd1: 1 }, orderBy: 'fd1', limit: 5 },
         `DELETE FROM tb1 WHERE fd1 = 1 ORDER BY fd1 LIMIT 5`,
       ],
     ];
