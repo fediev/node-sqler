@@ -484,18 +484,12 @@ describe('dml builder helper', function() {
       [
         'array of non object infos',
         [1, 'a', () => 'NOW()'],
-        {
-          insertFields: '',
-          insertValues: `(1, 'a', NOW())`,
-        },
+        { insertFields: '', insertValues: `(1, 'a', NOW())` },
       ],
       [
         'array of non object array infos',
         [[1, 'a'], [2, () => 'NOW()']],
-        {
-          insertFields: '',
-          insertValues: `(1, 'a'), (2, NOW())`,
-        },
+        { insertFields: '', insertValues: `(1, 'a'), (2, NOW())` },
       ],
     ];
 

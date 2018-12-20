@@ -399,15 +399,12 @@ describe('dml builder', function() {
 
     const testCases = [
       [
-        'should return insert sql',
-        {
-          tb: 'tb1',
-          infos: { fd1: 1, fd2: 'a', fd3: () => 'NOW()' },
-        },
+        'object insert infos',
+        { tb: 'tb1', infos: { fd1: 1, fd2: 'a', fd3: () => 'NOW()' } },
         `INSERT INTO tb1 (fd1, fd2, fd3) VALUES (1, 'a', NOW())`,
       ],
       [
-        'should return insert sql',
+        'array of objects insert infos : multirow insert',
         {
           tb: 'tb1',
           infos: [{ fd1: 1, fd2: 'a' }, { fd1: 2, fd2: () => 'NOW()' }],
@@ -415,7 +412,7 @@ describe('dml builder', function() {
         `INSERT INTO tb1 (fd1, fd2) VALUES (1, 'a'), (2, NOW())`,
       ],
       [
-        'should return insert sql',
+        'array of objects whose structures are different : multirow insert with default',
         {
           tb: 'tb1',
           infos: [{ fd1: 1, fd2: 'a' }, { fd1: 2, fd3: () => 'NOW()' }],
@@ -423,19 +420,13 @@ describe('dml builder', function() {
         `INSERT INTO tb1 (fd1, fd2, fd3) VALUES (1, 'a', DEFAULT), (2, DEFAULT, NOW())`,
       ],
       [
-        'should return insert sql',
-        {
-          tb: 'tb1',
-          infos: [1, 'a', () => 'NOW()'],
-        },
+        'array of non object : insert without fields list',
+        { tb: 'tb1', infos: [1, 'a', () => 'NOW()'] },
         `INSERT INTO tb1 VALUES (1, 'a', NOW())`,
       ],
       [
-        'should return insert sql',
-        {
-          tb: 'tb1',
-          infos: [[1, 'a'], [2, () => 'NOW()']],
-        },
+        'array of array : multirow insert without fields list',
+        { tb: 'tb1', infos: [[1, 'a'], [2, () => 'NOW()']] },
         `INSERT INTO tb1 VALUES (1, 'a'), (2, NOW())`,
       ],
       [
