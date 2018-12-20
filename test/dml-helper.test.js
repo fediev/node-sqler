@@ -500,6 +500,16 @@ describe('dml builder helper', function() {
     ];
 
     testCases.forEach(tester);
+
+    it(`should throw on whitespace`, function() {
+      expect(() => sqlInsertInfos('    ')).to.throw('INVALID_INSERET_INFOS');
+    });
+    it(`should throw on null`, function() {
+      expect(() => sqlInsertInfos(null)).to.throw('INVALID_INSERET_INFOS');
+    });
+    it(`should throw on undefined`, function() {
+      expect(() => sqlInsertInfos(undefined)).to.throw('INVALID_INSERET_INFOS');
+    });
   });
 
   describe('sqlUpdateInfos()', function() {
