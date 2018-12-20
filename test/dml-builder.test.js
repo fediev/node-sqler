@@ -439,12 +439,8 @@ describe('dml builder', function() {
         `INSERT INTO tb1 VALUES (1, 'a'), (2, NOW())`,
       ],
       [
-        'should return insert sql',
-        {
-          tb: 'tb1',
-          fields: 'fd1, fd2, fd3',
-          values: `1, 'a', NOW()`,
-        },
+        'string fields and values',
+        { tb: 'tb1', fields: ' fd1, fd2, fd3 ', values: ` 1, 'a', NOW() ` },
         `INSERT INTO tb1 (fd1, fd2, fd3) VALUES (1, 'a', NOW())`,
       ],
     ];
