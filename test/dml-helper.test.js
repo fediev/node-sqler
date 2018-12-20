@@ -546,6 +546,7 @@ describe('dml builder helper', function() {
         ],
         `fd1 = 1, fd2 = 'a', fd3 = NOW()`,
       ],
+      [`null --> ''`, null, ''],
     ];
 
     testCases.forEach(tester);
